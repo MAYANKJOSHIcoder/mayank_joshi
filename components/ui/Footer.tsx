@@ -1,17 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { FaArrowUp, FaHeart } from "react-icons/fa";
 import { socials } from "@/data/socials";
 import { siteConfig } from "@/data/site.config";
-import { VisitorCounter } from "./VisitorCounter";
 import { StarField } from "./StarField";
 
 export function Footer() {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
     <footer className="relative border-t border-[var(--card-border)] bg-[var(--card-bg)] overflow-hidden">
       <div className="absolute inset-0 opacity-30">
@@ -38,10 +32,8 @@ export function Footer() {
             })}
           </div>
 
-          <VisitorCounter />
-
-          <p className="text-sm text-[var(--muted)] flex items-center gap-1.5">
-            Made with <FaHeart className="h-3.5 w-3.5 text-red-500" /> by{" "}
+          <p className="text-sm text-[var(--muted)]">
+            Made by{" "}
             <span className="font-medium text-[var(--foreground)]">
               {siteConfig.name}
             </span>{" "}
@@ -50,13 +42,6 @@ export function Footer() {
         </div>
       </div>
 
-      <button
-        onClick={scrollToTop}
-        className="absolute -top-5 right-6 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white text-black light:bg-black light:text-white shadow-lg transition-all hover:scale-110 border border-[var(--card-border)]"
-        aria-label="Back to top"
-      >
-        <FaArrowUp className="h-4 w-4" />
-      </button>
     </footer>
   );
 }

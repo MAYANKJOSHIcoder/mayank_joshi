@@ -2,9 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
-import { FloatingShapes } from "./FloatingShapes";
-import { ParticleField } from "./ParticleField";
-import { GlowingSphere } from "./GlowingSphere";
+import { DottedWave } from "./DottedWave";
 
 function Loader() {
   return (
@@ -18,20 +16,16 @@ function Loader() {
 export default function ThreeScene() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 8], fov: 60 }}
+      camera={{ position: [0, 4, 8], fov: 55 }}
       style={{ background: "transparent" }}
       dpr={[1, 2]}
       performance={{ min: 0.5 }}
     >
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 5, 5]} intensity={0.9} />
-      <pointLight position={[-5, -5, 5]} intensity={0.4} color="#ffffff" />
-      <pointLight position={[5, -5, -5]} intensity={0.3} color="#cccccc" />
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 5, 5]} intensity={0.5} />
 
       <Suspense fallback={<Loader />}>
-        <GlowingSphere />
-        <FloatingShapes />
-        <ParticleField />
+        <DottedWave />
       </Suspense>
     </Canvas>
   );
