@@ -13,16 +13,27 @@ const SPREAD_Z = 12;
 export function DottedWave() {
   const pointsRef = useRef<Points>(null);
 
-  const { positions, colors } = useMemo(() => {
+  const { positions, colors, phaseX, phaseZ, phaseXZ } = useMemo(() => {
     const positions = new Float32Array(TOTAL * 3);
     const colors = new Float32Array(TOTAL * 3);
+    const phaseX = new Float32Array(TOTAL);
+    const phaseZ = new Float32Array(TOTAL);
+    const phaseXZ = new Float32Array(TOTAL);
 
     for (let i = 0; i < GRID_X; i++) {
       for (let j = 0; j < GRID_Z; j++) {
         const idx = (i * GRID_Z + j) * 3;
-        positions[idx] = (i / (GRID_X - 1) - 0.5) * SPREAD_X;
+        const dotIdx = i * GRID_Z + j;
+        const x = (i / (GRID_X - 1) - 0.5) * SPREAD_X;
+        const z = (j / (GRID_Z - 1) - 0.5) * SPREAD_Z;
+        positions[idx] = x;
         positions[idx + 1] = 0;
-        positions[idx + 2] = (j / (GRID_Z - 1) - 0.5) * SPREAD_Z;
+        positions[idx + 2] = z;
+
+        // Pre-compute static phase offsets
+        phaseX[dotIdx] = x * 0.4;
+        phaseZ[dotIdx] = z * 0.35;
+        phaseXZ[dotIdx] = (x + z) * 0.25;
 
         // Monochrome: white to light gray based on position
         const brightness = 0.5 + (i / GRID_X) * 0.4;
@@ -32,7 +43,7 @@ export function DottedWave() {
       }
     }
 
-    return { positions, colors };
+    return { positions, colors, phaseX, phaseZ, phaseXZ };
   }, []);
 
   useFrame((state) => {
@@ -45,14 +56,13 @@ export function DottedWave() {
     for (let i = 0; i < GRID_X; i++) {
       for (let j = 0; j < GRID_Z; j++) {
         const idx = (i * GRID_Z + j) * 3;
-        const x = positions[idx];
-        const z = positions[idx + 2];
+        const dotIdx = i * GRID_Z + j;
 
-        // Wave function: combination of sine and cosine for organic ripple
+        // Wave function: pre-computed phase offsets + time-varying component
         const y =
-          Math.sin(x * 0.4 + time * 0.7) * 0.6 +
-          Math.cos(z * 0.35 + time * 0.5) * 0.5 +
-          Math.sin((x + z) * 0.25 + time * 0.4) * 0.3;
+          Math.sin(phaseX[dotIdx] + time * 0.7) * 0.6 +
+          Math.cos(phaseZ[dotIdx] + time * 0.5) * 0.5 +
+          Math.sin(phaseXZ[dotIdx] + time * 0.4) * 0.3;
 
         posArray[idx + 1] = y;
       }

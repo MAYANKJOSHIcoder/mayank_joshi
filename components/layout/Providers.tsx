@@ -17,8 +17,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      {/* Site always renders behind the splash */}
-      {children}
+      {/* Hidden during splash to avoid unnecessary GPU/CPU work */}
+      <div style={{ visibility: showSplash ? "hidden" : "visible" }}>
+        {children}
+      </div>
       <AnimatePresence>
         {showSplash && (
           <motion.div
@@ -26,7 +28,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="fixed inset-0 z-[9999]"
-            onAnimationComplete={() => setShowSplash(false)}
           >
             <SplashScreen />
           </motion.div>

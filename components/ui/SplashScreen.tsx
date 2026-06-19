@@ -1,28 +1,51 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 
+interface Star {
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+  duration: number;
+  delay: number;
+}
+
 export function SplashScreen() {
+  const stars: Star[] = useMemo(
+    () =>
+      Array.from({ length: 40 }, () => ({
+        width: Math.random() * 2 + 1,
+        height: Math.random() * 2 + 1,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        duration: Math.random() * 2 + 2,
+        delay: Math.random() * 2,
+      })),
+    []
+  );
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--background)]">
       {/* Starfield background on splash */}
       <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 40 }).map((_, i) => (
+        {stars.map((star, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full bg-[var(--foreground)]"
             style={{
-              width: Math.random() * 2 + 1,
-              height: Math.random() * 2 + 1,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              width: star.width,
+              height: star.height,
+              left: `${star.left}%`,
+              top: `${star.top}%`,
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.4, 0] }}
             transition={{
-              duration: Math.random() * 2 + 2,
+              duration: star.duration,
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: star.delay,
             }}
           />
         ))}
