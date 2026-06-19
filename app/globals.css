@@ -39,6 +39,10 @@ body {
   background: var(--background);
   font-family: var(--font-outfit), system-ui, sans-serif;
   overflow-x: hidden;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* Scrollbar */
