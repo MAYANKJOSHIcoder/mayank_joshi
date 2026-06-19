@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -9,9 +9,20 @@ import { StarField } from "@/components/ui/StarField";
 import { socials } from "@/data/socials";
 import { FaPaperPlane, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 
+const MAX_TEXTAREA_HEIGHT = 200;
+
 export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoResize = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const newHeight = Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT);
+    el.style.height = newHeight + "px";
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +38,10 @@ export function Contact() {
       if (!res.ok) throw new Error("Failed");
       setStatus("success");
       setForm({ name: "", email: "", message: "" });
+      // Reset textarea height after clearing
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
     } catch {
       setStatus("error");
     }
@@ -53,7 +68,7 @@ export function Contact() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6"
+          className="space-y-4 max-w-xl mx-auto rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6"
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -91,13 +106,17 @@ export function Contact() {
               Message
             </label>
             <textarea
+              ref={textareaRef}
               id="contact-message"
               required
-              rows={5}
               value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
+              onChange={(e) => {
+                setForm({ ...form, message: e.target.value });
+                autoResize();
+              }}
               placeholder="Your message..."
-              className={inputClass + " resize-none"}
+              className={inputClass + " overflow-y-auto"}
+              style={{ minHeight: 100, maxHeight: MAX_TEXTAREA_HEIGHT, resize: "none" }}
             />
           </div>
 

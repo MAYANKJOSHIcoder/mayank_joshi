@@ -83,7 +83,11 @@ export function StarField({
     };
 
     let time = 0;
+    let isPaused = false;
+
     const animate = () => {
+      if (isPaused) return;
+
       const rect = canvas.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
       time += 1;
@@ -119,16 +123,33 @@ export function StarField({
       animFrameRef.current = requestAnimationFrame(animate);
     };
 
+    // Intersection Observer — pause animation when off-screen
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (isPaused) {
+            isPaused = false;
+            animFrameRef.current = requestAnimationFrame(animate);
+          }
+        } else {
+          isPaused = true;
+          cancelAnimationFrame(animFrameRef.current);
+        }
+      },
+      { threshold: 0, rootMargin: "50px" }
+    );
+    visibilityObserver.observe(canvas);
+
     resize();
     window.addEventListener("resize", resize);
     window.addEventListener("mousemove", handleMouseMove);
 
     // Re-init stars on theme change
-    const observer = new MutationObserver(() => {
+    const themeObserver = new MutationObserver(() => {
       const rect = canvas.getBoundingClientRect();
       initStars(rect.width, rect.height);
     });
-    observer.observe(document.documentElement, {
+    themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
     });
@@ -138,7 +159,8 @@ export function StarField({
     return () => {
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
-      observer.disconnect();
+      themeObserver.disconnect();
+      visibilityObserver.disconnect();
       cancelAnimationFrame(animFrameRef.current);
     };
   }, [initStars, minOpacity, maxOpacity, parallaxStrength, getStarColor]);

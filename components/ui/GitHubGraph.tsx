@@ -16,28 +16,29 @@ interface Week {
 
 interface GitHubData {
   configured: boolean;
+  year: number;
   totalContributions: number;
   totalRepos: number;
   totalStars: number;
   weeks: Week[];
 }
 
-// Monochrome contribution levels — dark mode
+// Contribution graph colors — dark mode (bright neon-ish greens that pop on #141414)
 const LEVEL_COLORS_DARK: Record<string, string> = {
-  NONE: "#161616",
-  FIRST_QUARTER: "#3a3a3a",
-  SECOND_QUARTER: "#6a6a6a",
-  THIRD_QUARTER: "#9a9a9a",
-  FOURTH_QUARTER: "#e0e0e0",
+  NONE: "#1a1e24",
+  FIRST_QUARTER: "#0e8a3c",
+  SECOND_QUARTER: "#18b84e",
+  THIRD_QUARTER: "#39d353",
+  FOURTH_QUARTER: "#5dff75",
 };
 
-// Monochrome contribution levels — light mode
+// Contribution graph colors — light mode
 const LEVEL_COLORS_LIGHT: Record<string, string> = {
-  NONE: "#e8e8e8",
-  FIRST_QUARTER: "#c0c0c0",
-  SECOND_QUARTER: "#909090",
-  THIRD_QUARTER: "#505050",
-  FOURTH_QUARTER: "#1a1a1a",
+  NONE: "#ebedf0",
+  FIRST_QUARTER: "#9be9a8",
+  SECOND_QUARTER: "#40c463",
+  THIRD_QUARTER: "#30a14e",
+  FOURTH_QUARTER: "#216e39",
 };
 
 const MONTH_LABELS = [
@@ -45,9 +46,19 @@ const MONTH_LABELS = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
+const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+
 export function GitHubGraph() {
   const [data, setData] = useState<GitHubData | null>(null);
+  const [error, setError] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+
+  const years = Array.from(
+    { length: Math.min(currentYear - 2007, 5) },
+    (_, i) => currentYear - i
+  );
 
   useEffect(() => {
     const detect = () => {
@@ -60,18 +71,41 @@ export function GitHubGraph() {
     detect();
     const observer = new MutationObserver(detect);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    fetch("/api/github")
+    fetch(`/api/github?year=${selectedYear}`)
       .then((res) => res.json())
-      .then((d) => setData(d))
-      .catch(() => setData(null));
+      .then((d) => {
+        setData(d);
+        setError(false);
+      })
+      .catch(() => {
+        setData(null);
+        setError(true);
+      });
     return () => observer.disconnect();
-  }, []);
+  }, [selectedYear]);
+
+  if (error) {
+    return (
+      <div className="max-w-3xl mx-auto rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-8">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <FaGithub className="h-8 w-8 text-[var(--muted)]" />
+          <div>
+            <p className="text-sm font-medium text-[var(--foreground)]">GitHub Stats</p>
+            <p className="mt-1 text-xs text-[var(--muted)] flex items-center gap-1.5 justify-center">
+              <FaExclamationCircle className="h-3 w-3" />
+              Failed to load GitHub data
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!data) return null;
 
   if (!data.configured) {
     return (
-      <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6">
+      <div className="max-w-3xl mx-auto rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-8">
         <div className="flex flex-col items-center gap-3 text-center">
           <FaGithub className="h-8 w-8 text-[var(--muted)]" />
           <div>
@@ -88,26 +122,53 @@ export function GitHubGraph() {
 
   const colors = isDark ? LEVEL_COLORS_DARK : LEVEL_COLORS_LIGHT;
 
+  // Cell sizing: compute to fit 53 weeks within the card
+  // Card max-w-3xl ≈ 768px, minus padding ~64px = ~704px usable
+  // Labels take ~36px, so grid area ≈ 668px
+  // 53 weeks need: 53 * CELL + 52 * GAP ≤ 668
+  // With GAP=2, CELL=12: 53*12 + 52*2 = 636+104 = 740 → slightly over
+  // Use CELL=11: 53*11 + 52*2 = 583+104 = 687 → fits with room
+  const CELL = 11;
+  const GAP = 2;
+  const LABEL_W = 36;
+
+  // Build month labels with their column positions
   const monthLabels: { label: string; col: number }[] = [];
   let lastMonth = -1;
-  if (data.weeks.length > 0) {
-    for (let weekIdx = 0; weekIdx < data.weeks.length; weekIdx++) {
-      const firstDay = data.weeks[weekIdx].contributionDays[0];
-      if (firstDay) {
-        const month = new Date(firstDay.date).getMonth();
-        if (month !== lastMonth) {
-          monthLabels.push({ label: MONTH_LABELS[month], col: weekIdx });
-          lastMonth = month;
-        }
+  for (let weekIdx = 0; weekIdx < data.weeks.length; weekIdx++) {
+    const firstDay = data.weeks[weekIdx].contributionDays[0];
+    if (firstDay) {
+      const month = new Date(firstDay.date + "T00:00:00").getMonth();
+      if (month !== lastMonth) {
+        monthLabels.push({ label: MONTH_LABELS[month], col: weekIdx });
+        lastMonth = month;
       }
     }
   }
 
-  const dayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
+  const totalGridWidth = data.weeks.length * (CELL + GAP) - GAP;
 
   return (
-    <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-6">
-      <div className="mb-6 flex flex-wrap items-center justify-center gap-6">
+    <div className="max-w-3xl mx-auto rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-8">
+      {/* Year selector */}
+      <div className="mb-5 flex items-center justify-center gap-2 flex-wrap">
+        {years.map((y) => (
+          <button
+            key={y}
+            onClick={() => setSelectedYear(y)}
+            className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              selectedYear === y
+                ? "bg-[var(--foreground)] text-[var(--background)]"
+                : "bg-[var(--card-border)] text-[var(--muted)] hover:text-[var(--foreground)]"
+            }`}
+          >
+            {y}
+          </button>
+        ))}
+      </div>
+
+      {/* Stats row */}
+      <div className="mb-6 flex flex-wrap items-center justify-center gap-8">
         <div className="flex items-center gap-3">
           <FaGithub className="h-5 w-5 text-[var(--muted)]" />
           <div>
@@ -124,47 +185,62 @@ export function GitHubGraph() {
         <div className="flex items-center gap-3">
           <div>
             <p className="text-2xl font-bold">{data.totalContributions}</p>
-            <p className="text-xs text-[var(--muted)]">Contributions</p>
+            <p className="text-xs text-[var(--muted)]">
+              Contributions in {data.year}
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <div className="inline-flex flex-col gap-0 min-w-fit">
-          <div className="flex ml-10 mb-1">
-            {monthLabels.map((m, i) => (
-              <div
-                key={i}
-                className="text-[10px] text-[var(--muted)]"
-                style={{
-                  position: "relative",
-                  left: `${m.col * 14}px`,
-                  marginRight:
-                    i < monthLabels.length - 1
-                      ? `${(monthLabels[i + 1]?.col - m.col) * 14 - 30}px`
-                      : 0,
-                }}
-              >
-                {m.label}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex gap-0">
-            <div className="flex flex-col gap-[3px] mr-2 pt-0">
-              {dayLabels.map((label, i) => (
+      {/* Contribution graph — no overflow, fully visible */}
+      <div className="flex justify-center">
+        <div>
+          {/* Month labels */}
+          <div className="flex" style={{ marginLeft: LABEL_W }}>
+            {monthLabels.map((m, i) => {
+              const nextCol =
+                i < monthLabels.length - 1
+                  ? monthLabels[i + 1].col
+                  : data.weeks.length;
+              const w = (nextCol - m.col) * (CELL + GAP);
+              return (
                 <div
                   key={i}
-                  className="h-[11px] text-[9px] text-[var(--muted)] flex items-center justify-end pr-1 w-7"
+                  className="text-[10px] text-[var(--muted)] shrink-0"
+                  style={{ width: w }}
+                >
+                  {m.label}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Day labels + grid */}
+          <div className="flex mt-1">
+            {/* Day labels */}
+            <div
+              className="flex flex-col shrink-0"
+              style={{ width: LABEL_W, gap: GAP }}
+            >
+              {DAY_LABELS.map((label, i) => (
+                <div
+                  key={i}
+                  className="text-[9px] text-[var(--muted)] flex items-center justify-end pr-2"
+                  style={{ height: CELL }}
                 >
                   {label}
                 </div>
               ))}
             </div>
 
-            <div className="flex gap-[3px]">
+            {/* Contribution cells — columns are weeks */}
+            <div className="flex" style={{ gap: GAP }}>
               {data.weeks.map((week, weekIdx) => (
-                <div key={weekIdx} className="flex flex-col gap-[3px]">
+                <div
+                  key={weekIdx}
+                  className="flex flex-col"
+                  style={{ gap: GAP }}
+                >
                   {Array.from({ length: 7 }).map((_, dayIdx) => {
                     const day = week.contributionDays.find(
                       (d) => d.weekday === dayIdx
@@ -172,17 +248,27 @@ export function GitHubGraph() {
                     const level = day?.contributionLevel ?? "NONE";
                     const count = day?.contributionCount ?? 0;
                     const date = day?.date ?? "";
-                    const color = colors[level] ?? colors.NONE;
+                    const bg = colors[level] ?? colors.NONE;
+                    const hasContributions = count > 0;
 
                     return (
                       <div
                         key={dayIdx}
-                        className="h-[11px] w-[11px] rounded-[2px] transition-transform hover:scale-150 cursor-pointer"
-                        style={{ backgroundColor: color }}
+                        className="rounded-sm cursor-pointer transition-transform hover:scale-150"
+                        style={{
+                          width: CELL,
+                          height: CELL,
+                          backgroundColor: bg,
+                          boxShadow: hasContributions
+                            ? `0 0 4px ${bg}, inset 0 0 0 1px rgba(255,255,255,0.25)`
+                            : "inset 0 0 0 1px rgba(128,128,128,0.08)",
+                        }}
                         title={
-                          count > 0
-                            ? `${count} contributions on ${date}`
-                            : `No contributions on ${date}`
+                          hasContributions
+                            ? `${count} contribution${count > 1 ? "s" : ""} on ${date}`
+                            : date
+                            ? `No contributions on ${date}`
+                            : ""
                         }
                       />
                     );
@@ -192,10 +278,23 @@ export function GitHubGraph() {
             </div>
           </div>
 
-          <div className="mt-3 flex items-center justify-end gap-2 text-[10px] text-[var(--muted)]">
+          {/* Legend */}
+          <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-[var(--muted)]">
             <span>Less</span>
-            {Object.values(colors).map((c, i) => (
-              <div key={i} className="h-[11px] w-[11px] rounded-[2px]" style={{ backgroundColor: c }} />
+            {Object.entries(colors).map(([level, c], i) => (
+              <div
+                key={i}
+                className="rounded-sm"
+                style={{
+                  width: CELL,
+                  height: CELL,
+                  backgroundColor: c,
+                  boxShadow:
+                    level === "NONE"
+                      ? "inset 0 0 0 1px rgba(128,128,128,0.08)"
+                      : `0 0 3px ${c}`,
+                }}
+              />
             ))}
             <span>More</span>
           </div>
