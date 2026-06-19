@@ -39,12 +39,15 @@ export async function GET() {
       )?.["#text"] ||
       undefined;
 
+    const artistName = track.artist?.["#text"] || "Unknown Artist";
+    const spotifySearchUrl = `https://open.spotify.com/search/${encodeURIComponent(`${track.name} ${artistName}`)}`;
+
     return NextResponse.json({
       isPlaying: isNowPlaying,
       title: track.name,
-      artist: track.artist?.["#text"] || "Unknown Artist",
+      artist: artistName,
       albumArt,
-      songUrl: track.url,
+      songUrl: spotifySearchUrl,
     });
   } catch {
     return NextResponse.json({ isPlaying: false });
