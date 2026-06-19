@@ -23,7 +23,7 @@ interface GitHubData {
   weeks: Week[];
 }
 
-// Contribution graph colors — dark mode (bright, visible greens on dark bg)
+// Contribution graph colors — dark mode (GitHub's original palette)
 const LEVEL_COLORS_DARK: Record<string, string> = {
   NONE: "#1b1f23",
   FIRST_QUARTER: "#006d32",
@@ -36,7 +36,7 @@ const LEVEL_COLORS_DARK: Record<string, string> = {
 const NONE_BORDER_DARK = "#3d444d";
 const NONE_BORDER_LIGHT = "#d0d7de";
 
-// Contribution graph colors — light mode
+// Contribution graph colors — light mode (GitHub's original palette)
 const LEVEL_COLORS_LIGHT: Record<string, string> = {
   NONE: "#ebedf0",
   FIRST_QUARTER: "#9be9a8",
@@ -80,6 +80,15 @@ export function GitHubGraph() {
       .then((d) => {
         setData(d);
         setError(false);
+        console.log(
+          d.weeks.flatMap((w: Week) =>
+            w.contributionDays.map((d: ContributionDay) => ({
+              date: d.date,
+              count: d.contributionCount,
+              level: d.contributionLevel,
+            }))
+          )
+        );
       })
       .catch(() => {
         setData(null);
@@ -261,12 +270,22 @@ export function GitHubGraph() {
                     const day = week.contributionDays.find(
                       (d) => d.weekday === dayIdx
                     );
-                    const level = day?.contributionLevel ?? "NONE";
                     const count = day?.contributionCount ?? 0;
                     const date = day?.date ?? "";
-                    const bg = colors[level] ?? colors.NONE;
+
+                    let bg: string;
+                    if (count === 0) {
+                      bg = colors.NONE;
+                    } else if (count <= 2) {
+                      bg = "#006d32";
+                    } else if (count <= 5) {
+                      bg = "#26a641";
+                    } else if (count <= 10) {
+                      bg = "#39d353";
+                    } else {
+                      bg = "#56d364";
+                    }
                     const hasContributions = count > 0;
-                    const noneBorder = isDark ? NONE_BORDER_DARK : NONE_BORDER_LIGHT;
 
                     return (
                       <div
@@ -276,9 +295,7 @@ export function GitHubGraph() {
                           width: CELL,
                           height: CELL,
                           backgroundColor: bg,
-                          boxShadow: hasContributions
-                            ? `0 0 6px ${bg}, 0 0 12px ${bg}40, inset 0 0 0 1px rgba(255,255,255,0.15)`
-                            : `inset 0 0 0 1px ${noneBorder}`,
+                          boxShadow: "none",
                         }}
                         title={
                           hasContributions
@@ -306,10 +323,7 @@ export function GitHubGraph() {
                   width: CELL,
                   height: CELL,
                   backgroundColor: c,
-                  boxShadow:
-                    level === "NONE"
-                      ? `inset 0 0 0 1px ${isDark ? NONE_BORDER_DARK : NONE_BORDER_LIGHT}`
-                      : `0 0 5px ${c}, 0 0 10px ${c}40`,
+                  boxShadow: "none",
                 }}
               />
             ))}
