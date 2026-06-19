@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
 
     if (!user) throw new Error("No user data");
 
-    const totalStars = user.repositories.nodes.reduce(
+    const totalStars = (user.repositories.nodes ?? []).reduce(
       (sum: number, repo: { stargazerCount: number }) => sum + repo.stargazerCount,
       0
     );
