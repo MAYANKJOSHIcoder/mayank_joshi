@@ -34,7 +34,7 @@ export function Hero() {
       <div className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-[var(--background)]/40 to-[var(--background)]" />
 
       {/* Content */}
-      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+      <div className="relative z-10 mx-auto w-full px-4 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

@@ -42,7 +42,7 @@ export function Contact() {
       </div>
       <div className="section-stars absolute inset-0 z-0" />
 
-      <div className="relative z-10 mx-auto max-w-3xl px-6">
+      <div className="relative z-10 mx-auto w-full px-4">
         <SectionHeading
           title="Get in Touch"
           subtitle="Have a question or want to collaborate? Drop me a message!"

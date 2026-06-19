@@ -15,7 +15,7 @@ export function Experience() {
 
       <div className="section-stars absolute inset-0 z-0" />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6">
+      <div className="relative z-10 mx-auto w-full px-4">
         <SectionHeading
           title="Experience"
           subtitle="My journey in tech and education"

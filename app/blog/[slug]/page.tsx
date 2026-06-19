@@ -15,7 +15,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
       <div className="section-stars absolute inset-0 z-0" />
 
-      <div className="relative z-10 mx-auto max-w-3xl px-6">
+      <div className="relative z-10 mx-auto w-full px-4">
         <Link
           href="/blog"
           className="inline-flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors mb-8"

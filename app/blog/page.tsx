@@ -10,7 +10,7 @@ export default function BlogPage() {
 
       <div className="section-stars absolute inset-0 z-0" />
 
-      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
+      <div className="relative z-10 mx-auto w-full px-4 text-center">
         <div className="mb-4 flex justify-center">
           <FaFeatherAlt className="h-12 w-12 text-[var(--muted)]" />
         </div>

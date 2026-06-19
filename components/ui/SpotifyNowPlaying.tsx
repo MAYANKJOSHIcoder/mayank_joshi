@@ -30,11 +30,13 @@ export function SpotifyNowPlaying() {
     };
 
     fetchSpotify();
-    const interval = setInterval(fetchSpotify, 30000);
+    const interval = setInterval(fetchSpotify, 15000);
     return () => clearInterval(interval);
   }, []);
 
-  if (loading || !data?.isPlaying) return null;
+  if (loading || !data) return null;
+
+  const isNowPlaying = data.isPlaying && data.title;
 
   return (
     <div className="mt-6 flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
@@ -50,8 +52,17 @@ export function SpotifyNowPlaying() {
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-[var(--muted)]">Now Playing on Spotify</p>
-        <p className="truncate text-sm font-medium">{data.title}</p>
+        <p className="text-xs text-[var(--muted)]">
+          {isNowPlaying ? "Now Playing on Spotify" : "Last Played on Spotify"}
+        </p>
+        <a
+          href={data.songUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="truncate text-sm font-medium hover:underline block"
+        >
+          {data.title}
+        </a>
         <p className="truncate text-xs text-[var(--muted)]">{data.artist}</p>
       </div>
       <FaSpotify className="h-5 w-5 text-[var(--muted)] shrink-0" />

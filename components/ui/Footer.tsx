@@ -12,7 +12,7 @@ export function Footer() {
         <StarField count={60} minOpacity={0.03} maxOpacity={0.12} parallaxStrength={0} />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6 py-12">
+      <div className="relative z-10 mx-auto w-full px-4 py-12">
         <div className="flex flex-col items-center gap-6">
           <div className="flex gap-6">
             {socials.map((social) => {

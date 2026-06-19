@@ -15,7 +15,7 @@ export function Projects() {
 
       <div className="section-stars absolute inset-0 z-0" />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6">
+      <div className="relative z-10 mx-auto w-full px-4">
         <SectionHeading
           title="Projects"
           subtitle="Some things I've built or am working on"

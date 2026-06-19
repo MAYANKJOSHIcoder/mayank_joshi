@@ -35,7 +35,7 @@ export function Navbar() {
           isScrolled ? "glass shadow-lg" : "bg-transparent"
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex w-full items-center justify-between px-4 py-4">
           <Link href="/" className="text-xl font-bold gradient-text">
             MJ
           </Link>
@@ -87,7 +87,7 @@ export function Navbar() {
               exit={{ opacity: 0, height: 0 }}
               className="glass md:hidden"
             >
-              <div className="flex flex-col gap-4 px-6 py-6">
+              <div className="flex flex-col gap-4 px-4 py-6">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}

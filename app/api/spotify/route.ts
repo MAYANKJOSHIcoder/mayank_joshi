@@ -1,66 +1,50 @@
 import { NextResponse } from "next/server";
 
-const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const SPOTIFY_REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
-
-async function getAccessToken(): Promise<string | null> {
-  if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET || !SPOTIFY_REFRESH_TOKEN) {
-    return null;
-  }
-
-  const basic = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString("base64");
-
-  try {
-    const res = await fetch("https://accounts.spotify.com/api/token", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${basic}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        grant_type: "refresh_token",
-        refresh_token: SPOTIFY_REFRESH_TOKEN,
-      }),
-    });
-
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.access_token;
-  } catch {
-    return null;
-  }
-}
+const LASTFM_API_KEY = process.env.LASTFM_API_KEY;
+const LASTFM_USERNAME = process.env.LASTFM_USERNAME;
 
 export async function GET() {
-  const token = await getAccessToken();
-  if (!token) {
+  if (!LASTFM_API_KEY || !LASTFM_USERNAME) {
     return NextResponse.json({ isPlaying: false });
   }
 
   try {
     const res = await fetch(
-      "https://api.spotify.com/v1/me/player/currently-playing",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=1`,
+      { next: { revalidate: 15 } }
     );
 
-    if (res.status === 204 || !res.ok) {
+    if (!res.ok) {
       return NextResponse.json({ isPlaying: false });
     }
 
     const data = await res.json();
-    if (!data.is_playing || !data.item) {
+
+    if (data.error || !data.recenttracks?.track?.length) {
       return NextResponse.json({ isPlaying: false });
     }
 
+    const track = data.recenttracks.track[0];
+
+    // Last.fm returns "@attr": { "nowplaying": "true" } when currently playing
+    const isNowPlaying = track["@attr"]?.nowplaying === "true";
+
+    // Album art: Last.fm returns images in sizes: small, medium, large, extralarge
+    const albumArt =
+      track.image?.find(
+        (img: { size: string; "#text": string }) => img.size === "extralarge"
+      )?.["#text"] ||
+      track.image?.find(
+        (img: { size: string; "#text": string }) => img.size === "large"
+      )?.["#text"] ||
+      undefined;
+
     return NextResponse.json({
-      isPlaying: true,
-      title: data.item.name,
-      artist: data.item.artists.map((a: { name: string }) => a.name).join(", "),
-      albumArt: data.item.album.images[0]?.url,
-      songUrl: data.item.external_urls?.spotify,
+      isPlaying: isNowPlaying,
+      title: track.name,
+      artist: track.artist?.["#text"] || "Unknown Artist",
+      albumArt,
+      songUrl: track.url,
     });
   } catch {
     return NextResponse.json({ isPlaying: false });
