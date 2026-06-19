@@ -147,34 +147,33 @@ export function GitHubGraph() {
 
   const colors = isDark ? LEVEL_COLORS_DARK : LEVEL_COLORS_LIGHT;
 
-  // Cell sizing: compute to fit 53 weeks within the card
-  // Card max-w-3xl ≈ 768px, minus padding ~64px = ~704px usable
-  // Labels take ~36px, so grid area ≈ 668px
-  // 53 weeks need: 53 * CELL + 52 * GAP ≤ 668
-  // With GAP=2, CELL=12: 53*12 + 52*2 = 636+104 = 740 → slightly over
-  // Use CELL=11: 53*11 + 52*2 = 583+104 = 687 → fits with room
-  const CELL = 11;
-  const GAP = 2;
-  const LABEL_W = 36;
-
   // Build month labels with their column positions
-  const monthLabels: { label: string; col: number }[] = [];
+  const monthLabels: { label: string; col: number; span: number }[] = [];
   let lastMonth = -1;
   for (let weekIdx = 0; weekIdx < data.weeks.length; weekIdx++) {
     const firstDay = data.weeks[weekIdx].contributionDays[0];
     if (firstDay) {
       const month = new Date(firstDay.date + "T00:00:00").getMonth();
       if (month !== lastMonth) {
-        monthLabels.push({ label: MONTH_LABELS[month], col: weekIdx });
+        monthLabels.push({ label: MONTH_LABELS[month], col: weekIdx, span: 0 });
         lastMonth = month;
       }
     }
   }
+  // Compute span for each month label
+  for (let i = 0; i < monthLabels.length; i++) {
+    monthLabels[i].span =
+      (i < monthLabels.length - 1
+        ? monthLabels[i + 1].col
+        : data.weeks.length) - monthLabels[i].col;
+  }
 
-  const totalGridWidth = data.weeks.length * (CELL + GAP) - GAP;
+  const GAP = 2;
+  const totalCols = data.weeks.length;
+  const CELL = 12;
 
   return (
-    <div className="max-w-3xl mx-auto rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-8">
+    <div className="max-w-5xl mx-auto rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-4 sm:p-8">
       {/* Year selector */}
       <div className="mb-5 flex items-center justify-center gap-2 flex-wrap">
         {years.map((y) => (
@@ -217,117 +216,114 @@ export function GitHubGraph() {
         </div>
       </div>
 
-      {/* Contribution graph — no overflow, fully visible */}
+      {/* Contribution graph — centered, fixed 12px cells, scrollable */}
       <div className="flex justify-center">
-        <div>
-          {/* Month labels */}
-          <div className="flex" style={{ marginLeft: LABEL_W }}>
-            {monthLabels.map((m, i) => {
-              const nextCol =
-                i < monthLabels.length - 1
-                  ? monthLabels[i + 1].col
-                  : data.weeks.length;
-              const w = (nextCol - m.col) * (CELL + GAP);
-              return (
-                <div
-                  key={i}
-                  className="text-[10px] text-[var(--muted)] shrink-0"
-                  style={{ width: w }}
-                >
-                  {m.label}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Day labels + grid */}
-          <div className="flex mt-1">
-            {/* Day labels */}
+        <div className="inline-block overflow-x-auto">
+          <div className="flex flex-col" style={{ gap: GAP }}>
+            {/* Month labels */}
             <div
-              className="flex flex-col shrink-0"
-              style={{ width: LABEL_W, gap: GAP }}
+              className="grid"
+              style={{
+                gridTemplateColumns: `36px repeat(${totalCols}, ${CELL}px)`,
+                gap: GAP,
+              }}
             >
-              {DAY_LABELS.map((label, i) => (
-                <div
-                  key={i}
-                  className="text-[9px] text-[var(--muted)] flex items-center justify-end pr-2"
-                  style={{ height: CELL }}
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
-
-            {/* Contribution cells — columns are weeks */}
-            <div className="flex" style={{ gap: GAP }}>
-              {data.weeks.map((week, weekIdx) => (
-                <div
-                  key={weekIdx}
-                  className="flex flex-col"
-                  style={{ gap: GAP }}
-                >
-                  {Array.from({ length: 7 }).map((_, dayIdx) => {
-                    const day = week.contributionDays.find(
-                      (d) => d.weekday === dayIdx
-                    );
-                    const count = day?.contributionCount ?? 0;
-                    const date = day?.date ?? "";
-
-                    let bg: string;
-                    if (count === 0) {
-                      bg = colors.NONE;
-                    } else if (count <= 2) {
-                      bg = "#006d32";
-                    } else if (count <= 5) {
-                      bg = "#26a641";
-                    } else if (count <= 10) {
-                      bg = "#39d353";
-                    } else {
-                      bg = "#56d364";
-                    }
-                    const hasContributions = count > 0;
-
-                    return (
-                      <div
-                        key={dayIdx}
-                        className="rounded-sm cursor-pointer transition-transform hover:scale-150"
-                        style={{
-                          width: CELL,
-                          height: CELL,
-                          backgroundColor: bg,
-                          boxShadow: "none",
-                        }}
-                        title={
-                          hasContributions
-                            ? `${count} contribution${count > 1 ? "s" : ""} on ${date}`
-                            : date
-                            ? `No contributions on ${date}`
-                            : ""
-                        }
-                      />
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Legend */}
-          <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-[var(--muted)]">
-            <span>Less</span>
-            {Object.entries(colors).map(([level, c], i) => (
+            {/* Empty cell under day labels */}
+            <div />
+            {monthLabels.map((m, i) => (
               <div
                 key={i}
-                className="rounded-sm"
+                className="text-[10px] text-[var(--muted)] text-left overflow-hidden"
                 style={{
-                  width: CELL,
-                  height: CELL,
-                  backgroundColor: c,
-                  boxShadow: "none",
+                  gridColumn: `${m.col + 2} / span ${m.span}`,
                 }}
-              />
+              >
+                {m.label}
+              </div>
             ))}
-            <span>More</span>
+          </div>
+
+            {/* Grid: day labels + contribution cells */}
+            <div
+              className="grid"
+              style={{
+                gridTemplateColumns: `36px repeat(${totalCols}, ${CELL}px)`,
+                gridTemplateRows: `repeat(7, ${CELL}px)`,
+                gap: GAP,
+              }}
+            >
+            {/* Day labels column */}
+            {DAY_LABELS.map((label, i) => (
+              <div
+                key={i}
+                className="text-[9px] text-[var(--muted)] flex items-center justify-end pr-2"
+                style={{ gridColumn: 1, gridRow: i + 1 }}
+              >
+                {label}
+              </div>
+            ))}
+
+            {/* Week columns */}
+            {data.weeks.map((week, weekIdx) =>
+              Array.from({ length: 7 }).map((_, dayIdx) => {
+                const day = week.contributionDays.find(
+                  (d) => d.weekday === dayIdx
+                );
+                const count = day?.contributionCount ?? 0;
+                const date = day?.date ?? "";
+
+                let bg: string;
+                if (count === 0) {
+                  bg = colors.NONE;
+                } else if (count <= 2) {
+                  bg = "#006d32";
+                } else if (count <= 5) {
+                  bg = "#26a641";
+                } else if (count <= 10) {
+                  bg = "#39d353";
+                } else {
+                  bg = "#56d364";
+                }
+                const hasContributions = count > 0;
+
+                return (
+                  <div
+                    key={`${weekIdx}-${dayIdx}`}
+                    className="rounded-sm cursor-pointer hover:opacity-80"
+                    style={{
+                      gridColumn: weekIdx + 2,
+                      gridRow: dayIdx + 1,
+                      backgroundColor: bg,
+                    }}
+                    title={
+                      hasContributions
+                        ? `${count} contribution${count > 1 ? "s" : ""} on ${date}`
+                        : date
+                        ? `No contributions on ${date}`
+                        : ""
+                    }
+                  />
+                );
+              })
+            )}
+          </div>
+
+            {/* Legend */}
+            <div className="flex items-center justify-end gap-1.5 mt-2 text-[10px] text-[var(--muted)]">
+              <span>Less</span>
+              {Object.entries(colors).map(([level, c], i) => (
+                <div
+                  key={i}
+                  className="rounded-sm"
+                  style={{
+                    width: 12,
+                    height: 12,
+                    backgroundColor: c,
+                  }}
+                />
+              ))}
+              <span>More</span>
+            </div>
           </div>
         </div>
       </div>
