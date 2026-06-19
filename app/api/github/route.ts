@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_USERNAME = "MAYANKJOSHIcoder";
 
+// Cache GitHub data for 1 hour — contributions don't change minute-to-minute
+export const revalidate = 3600;
+
 export async function GET(request: NextRequest) {
   const currentYear = new Date().getFullYear();
 

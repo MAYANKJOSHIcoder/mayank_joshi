@@ -10,17 +10,19 @@
 ## ✨ Features
 
 - **3D Hero Scene** — Interactive Three.js/R3F dotted wave animation with viewport-aware rendering (pauses when off-screen to save GPU/CPU)
-- **Dark/Light Theme** — System-aware theme toggle with `next-themes`
 - **Animated Star Field** — Decorative canvas particle background with parallax mouse effect and viewport-aware animation pausing
+- **Dark/Light Theme** — System-aware theme toggle with `next-themes`
 - **Smooth Animations** — Framer Motion-powered transitions and scroll reveals
-- **Blog** — MDX-based blog with syntax highlighting
-- **Projects Showcase** — Tech stack tags, live/demo links, and featured highlights
-- **Skills Overview** — Categorized skill badges with proficiency levels
+- **Splash Screen** — Intro animation on first visit
+- **Scroll Progress** — Reading progress indicator at the top of the page
+- **Projects Showcase** — Tech stack tags, live/demo links, and featured highlights with tilt effect cards
+- **Skills Overview** — Categorized skill badges with proficiency levels (Languages, Frameworks, AI/ML, Databases, Tools)
 - **Experience Timeline** — Chronological career/education timeline
+- **Blog** — MDX-based blog with syntax highlighting
 - **GitHub Activity Graph** — Full contribution calendar with multi-year selector, bright green contribution cells with glow effects, and stats (repos, stars, contributions)
-- **Contact Form** — Centered form with auto-expanding textarea, powered by Resend (optional)
 - **Last.fm Now Playing** — Live Spotify status via the Last.fm API (optional)
-- **SEO Optimized** — Open Graph, Twitter cards, `sitemap.xml`, `robots.ts`
+- **Contact Form** — Centered form with auto-expanding textarea, powered by Resend (optional)
+- **SEO Optimized** — Open Graph images (dynamic OG route), Twitter cards, `sitemap.xml`, `robots.ts`
 - **Vercel Analytics & Speed Insights** — Built-in performance monitoring
 
 ## 🛠 Tech Stack
@@ -35,6 +37,8 @@
 | Icons              | [React Icons](https://react-icons.github.io/react-icons/) |
 | Blog               | [next-mdx-remote](https://github.com/hashicorp/next-mdx-remote) |
 | Theme Management   | [next-themes](https://github.com/pacocoursey/next-themes) |
+| Email              | [Resend](https://resend.com/)                   |
+| Analytics          | [Vercel Analytics](https://vercel.com/analytics) + [Speed Insights](https://vercel.com/docs/speed-insights) |
 | Deployment         | [Vercel](https://vercel.com/)                   |
 
 ## 🚀 Getting Started
@@ -60,15 +64,15 @@ cp .env.example .env.local
 
 ### Environment Variables
 
-Most features work out of the box. The following are **optional** integrations:
+The site works out of the box without any env vars. The following are **optional** integrations:
 
-| Variable               | Purpose                  |
-| ---------------------- | ------------------------ |
-| `LASTFM_API_KEY`       | Last.fm Now Playing      |
-| `LASTFM_USERNAME`      | Last.fm Now Playing      |
-| `GITHUB_TOKEN`         | GitHub Stats / Graph     |
-| `RESEND_API_KEY`       | Contact Form             |
-| `CONTACT_EMAIL`        | Contact Form recipient   |
+| Variable               | Purpose                            |
+| ---------------------- | ---------------------------------- |
+| `LASTFM_API_KEY`       | Last.fm Now Playing (Spotify)      |
+| `LASTFM_USERNAME`      | Last.fm Now Playing (Spotify)      |
+| `GITHUB_TOKEN`         | GitHub Stats / Contribution Graph  |
+| `RESEND_API_KEY`       | Contact Form email delivery        |
+| `CONTACT_EMAIL`        | Contact Form recipient address     |
 
 See `.env.example` for the full list.
 
@@ -96,68 +100,72 @@ npm run lint
 ## 📁 Project Structure
 
 ```
-├── app/                       # Next.js App Router
-│   ├── layout.tsx             # Root layout (fonts, providers, metadata)
-│   ├── page.tsx               # Home page (section composition)
-│   ├── globals.css            # Global styles + CSS variables
-│   ├── loading.tsx            # Loading state
-│   ├── not-found.tsx          # 404 page
-│   ├── og/                    # Open Graph image generation
-│   ├── blog/                  # Blog pages (MDX)
-│   ├── api/
-│   │   ├── github/route.ts    # GitHub GraphQL API (multi-year contributions)
-│   │   └── contact/route.ts   # Contact form email via Resend
-│   ├── robots.ts              # Robots.txt generator
-│   └── sitemap.ts             # Sitemap generator
+├── app/                          # Next.js App Router
+│   ├── layout.tsx                # Root layout (fonts, providers, metadata)
+│   ├── page.tsx                  # Home page (section composition)
+│   ├── globals.css               # Global styles + CSS variables
+│   ├── loading.tsx               # Loading state
+│   ├── not-found.tsx             # 404 page
+│   ├── og/route.tsx              # Dynamic Open Graph image generation
+│   ├── robots.ts                 # Robots.txt generator
+│   ├── sitemap.ts                # Sitemap generator
+│   ├── blog/
+│   │   ├── page.tsx              # Blog listing
+│   │   └── [slug]/page.tsx       # Individual blog post (MDX)
+│   └── api/
+│       ├── github/route.ts       # GitHub GraphQL API (multi-year contributions)
+│       ├── spotify/route.ts      # Last.fm now-playing endpoint
+│       └── contact/route.ts      # Contact form email via Resend
 ├── components/
-│   ├── layout/                # Global layout wrappers (Providers)
-│   ├── sections/              # Page sections
-│   │   ├── Hero.tsx           # Hero with 3D scene
-│   │   ├── About.tsx          # About / bio
-│   │   ├── Projects.tsx       # Projects grid
-│   │   ├── Skills.tsx         # Skills categorized list + GitHub graph
-│   │   ├── Experience.tsx     # Experience timeline
-│   │   └── Contact.tsx        # Contact form with auto-expanding textarea
-│   ├── three/                 # Three.js / R3F scenes
-│   │   ├── Scene.tsx          # R3F canvas wrapper with viewport-aware frameloop
-│   │   └── DottedWave.tsx     # Dotted wave mesh
-│   └── ui/                    # Reusable UI components
-│       ├── Navbar.tsx         # Navigation bar
-│       ├── Footer.tsx         # Footer
-│       ├── StarField.tsx      # Animated star particles (viewport-aware)
-│       ├── SplashScreen.tsx   # Intro splash screen
-│       ├── ThemeToggle.tsx    # Dark/light toggle
-│       ├── ScrollProgress.tsx # Reading progress bar
-│       ├── Button.tsx         # Reusable button
-│       ├── SectionHeading.tsx # Section title component
-│       ├── ProjectCard.tsx    # Project card with tilt
-│       ├── SkillBadge.tsx     # Skill pill/badge
-│       ├── TimelineItem.tsx   # Timeline entry
-│       ├── GitHubGraph.tsx    # GitHub contribution graph with year selector
+│   ├── layout/
+│   │   └── Providers.tsx         # Global layout wrappers (theme, analytics)
+│   ├── sections/                 # Page sections
+│   │   ├── Hero.tsx              # Hero with 3D scene
+│   │   ├── About.tsx             # About / bio
+│   │   ├── Projects.tsx          # Projects grid
+│   │   ├── Skills.tsx            # Skills categorized list + GitHub graph
+│   │   ├── Experience.tsx        # Experience timeline
+│   │   └── Contact.tsx           # Contact form with auto-expanding textarea
+│   ├── three/                    # Three.js / R3F scenes
+│   │   ├── Scene.tsx             # R3F canvas wrapper with viewport-aware frameloop
+│   │   └── DottedWave.tsx        # Dotted wave mesh
+│   └── ui/                       # Reusable UI components
+│       ├── Navbar.tsx            # Navigation bar
+│       ├── Footer.tsx            # Footer
+│       ├── StarField.tsx         # Animated star particles (viewport-aware)
+│       ├── SplashScreen.tsx      # Intro splash screen
+│       ├── ThemeToggle.tsx       # Dark/light toggle
+│       ├── ScrollProgress.tsx    # Reading progress bar
+│       ├── Button.tsx            # Reusable button
+│       ├── SectionHeading.tsx    # Section title component
+│       ├── ProjectCard.tsx       # Project card with tilt effect
+│       ├── SkillBadge.tsx        # Skill pill/badge
+│       ├── TimelineItem.tsx      # Timeline entry
+│       ├── GitHubGraph.tsx       # GitHub contribution graph with year selector
 │       └── SpotifyNowPlaying.tsx # Current Spotify track (via Last.fm)
 ├── data/
-│   ├── site.config.ts         # Site-wide metadata
-│   ├── socials.ts             # Social media links
-│   ├── skills.ts              # Skills data
-│   ├── projects.ts            # Projects data
-│   └── experience.ts          # Experience / education data
+│   ├── site.config.ts            # Site-wide metadata (name, tagline, college, etc.)
+│   ├── socials.ts                # Social media links (GitHub, LinkedIn, Twitter)
+│   ├── skills.ts                 # Skills data (5 categories, 24 skills)
+│   ├── projects.ts               # Projects data (5 projects, 3 featured)
+│   └── experience.ts             # Experience / education data (3 entries)
 ├── lib/
-│   ├── cn.ts                  # Tailwind merge utility
+│   ├── cn.ts                     # Tailwind merge utility (clsx + tailwind-merge)
 │   └── hooks/
 │       └── useIntersectionObserver.ts  # Shared viewport visibility hook
 ├── public/
-│   └── images/                # Static assets
-├── tailwind.config.ts         # Tailwind configuration
-├── next.config.mjs            # Next.js configuration
-├── tsconfig.json              # TypeScript configuration
-└── postcss.config.mjs         # PostCSS configuration
+│   └── images/                   # Static assets (project images, etc.)
+├── tailwind.config.ts            # Tailwind configuration
+├── next.config.mjs               # Next.js configuration
+├── tsconfig.json                 # TypeScript configuration
+└── postcss.config.mjs            # PostCSS configuration
 ```
 
 ## 🎨 Sections
 
 1. **Hero** — Greeting, tagline, and CTA buttons with an interactive 3D dotted wave background
 2. **About** — Bio, interests (AI/ML, Gaming, Photography/Art), quick facts
-3. **Projects** — Featured and non-featured project cards with tech stack badges
+3. **Projects** — Featured and non-featured project cards with tech stack badges and tilt effect
 4. **Skills** — Skills grouped by category (Languages, Frameworks, AI/ML, Databases, Tools) with an inline GitHub contribution graph
 5. **Experience** — Education, open-source contributions, hackathon participation
 6. **Contact** — Centered contact form with auto-expanding message textarea + social links (GitHub, LinkedIn, Twitter)
@@ -180,7 +188,17 @@ The GitHub contribution graph uses the **GitHub GraphQL API** (`contributionsCol
 
 ### Required Token Scope
 
-`GITHUB_TOKEN` only needs **public read access** (no special OAuth scopes required for public repos and contributions).
+`GITHUB_TOKEN` only needs **public read access** — no special OAuth scopes required for public repos and contributions.
+
+## 🎵 Spotify / Last.fm Integration
+
+The `SpotifyNowPlaying` component shows your currently playing track by connecting to the **Last.fm API** (which scrobbles from Spotify).
+
+1. Connect your Spotify account to [Last.fm](https://www.last.fm/settings/applications)
+2. Get a Last.fm API key from [last.fm/api](https://www.last.fm/api/account/create)
+3. Set `LASTFM_API_KEY` and `LASTFM_USERNAME` in `.env.local`
+
+The endpoint revalidates every 15 seconds for near real-time updates.
 
 ## 📝 Customization
 
@@ -188,7 +206,7 @@ The GitHub contribution graph uses the **GitHub GraphQL API** (`contributionsCol
 - **Colors & Theme**: Adjust CSS variables in `app/globals.css` and Tailwind theme in `tailwind.config.ts`.
 - **Fonts**: Change the font in `app/layout.tsx` (currently [Outfit](https://fonts.google.com/specimen/Outfit)).
 - **3D Scene**: Modify `components/three/DottedWave.tsx` or swap the scene entirely.
-- **GitHub username**: Update `GITHUB_USERNAME` in `app/api/github/route.ts`.
+- **GitHub username**: Update the username in `app/api/github/route.ts`.
 
 ## 📄 License
 

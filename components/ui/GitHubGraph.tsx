@@ -23,14 +23,18 @@ interface GitHubData {
   weeks: Week[];
 }
 
-// Contribution graph colors — dark mode (bright neon-ish greens that pop on #141414)
+// Contribution graph colors — dark mode (bright, visible greens on dark bg)
 const LEVEL_COLORS_DARK: Record<string, string> = {
-  NONE: "#1a1e24",
-  FIRST_QUARTER: "#0e8a3c",
-  SECOND_QUARTER: "#18b84e",
+  NONE: "#1b1f23",
+  FIRST_QUARTER: "#006d32",
+  SECOND_QUARTER: "#26a641",
   THIRD_QUARTER: "#39d353",
-  FOURTH_QUARTER: "#5dff75",
+  FOURTH_QUARTER: "#56d364",
 };
+
+// Border color for NONE cells — adapts to theme
+const NONE_BORDER_DARK = "#3d444d";
+const NONE_BORDER_LIGHT = "#d0d7de";
 
 // Contribution graph colors — light mode
 const LEVEL_COLORS_LIGHT: Record<string, string> = {
@@ -101,7 +105,19 @@ export function GitHubGraph() {
     );
   }
 
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="max-w-3xl mx-auto rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-8">
+        <div className="flex flex-col items-center gap-3 text-center animate-pulse">
+          <FaGithub className="h-8 w-8 text-[var(--muted)] opacity-40" />
+          <div>
+            <p className="text-sm font-medium text-[var(--foreground)]">GitHub Stats</p>
+            <p className="mt-1 text-xs text-[var(--muted)]">Loading…</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!data.configured) {
     return (
@@ -250,6 +266,7 @@ export function GitHubGraph() {
                     const date = day?.date ?? "";
                     const bg = colors[level] ?? colors.NONE;
                     const hasContributions = count > 0;
+                    const noneBorder = isDark ? NONE_BORDER_DARK : NONE_BORDER_LIGHT;
 
                     return (
                       <div
@@ -260,8 +277,8 @@ export function GitHubGraph() {
                           height: CELL,
                           backgroundColor: bg,
                           boxShadow: hasContributions
-                            ? `0 0 4px ${bg}, inset 0 0 0 1px rgba(255,255,255,0.25)`
-                            : "inset 0 0 0 1px rgba(128,128,128,0.08)",
+                            ? `0 0 6px ${bg}, 0 0 12px ${bg}40, inset 0 0 0 1px rgba(255,255,255,0.15)`
+                            : `inset 0 0 0 1px ${noneBorder}`,
                         }}
                         title={
                           hasContributions
@@ -291,8 +308,8 @@ export function GitHubGraph() {
                   backgroundColor: c,
                   boxShadow:
                     level === "NONE"
-                      ? "inset 0 0 0 1px rgba(128,128,128,0.08)"
-                      : `0 0 3px ${c}`,
+                      ? `inset 0 0 0 1px ${isDark ? NONE_BORDER_DARK : NONE_BORDER_LIGHT}`
+                      : `0 0 5px ${c}, 0 0 10px ${c}40`,
                 }}
               />
             ))}
