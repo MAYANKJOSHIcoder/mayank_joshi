@@ -214,7 +214,7 @@ The endpoint revalidates every 15 seconds for near real-time updates.
 
 ## 🔗 Links
 
-- **Live**: [mayank.vercel.app](https://mayank.vercel.app)
+- **Live**: [mayank-joshi-07](https://mayank-joshi-07.vercel.app)
 - **GitHub**: [@MAYANKJOSHIcoder](https://github.com/MAYANKJOSHIcoder)
 - **LinkedIn**: [Mayank Joshi](https://www.linkedin.com/in/mayank-joshi-a70591271)
 - **Twitter**: [@MayankJoshi200](https://x.com/MayankJoshi200)
