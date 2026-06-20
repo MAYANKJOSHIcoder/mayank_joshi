@@ -22,7 +22,7 @@ export function Hero() {
         <Suspense
           fallback={
             <div className="flex h-full w-full items-center justify-center bg-transparent">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-white border-t-transparent light:border-black light:border-t-transparent" />
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--foreground)] border-t-transparent" />
             </div>
           }
         >

@@ -55,8 +55,6 @@ export function Contact() {
       <div className="absolute inset-0 z-0">
         <StarField count={80} minOpacity={0.03} maxOpacity={0.15} parallaxStrength={0.01} />
       </div>
-      <div className="section-stars absolute inset-0 z-0" />
-
       <div className="relative z-10 mx-auto w-full px-4">
         <SectionHeading
           title="Get in Touch"

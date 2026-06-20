@@ -80,15 +80,6 @@ export function GitHubGraph() {
       .then((d) => {
         setData(d);
         setError(false);
-        console.log(
-          d.weeks.flatMap((w: Week) =>
-            w.contributionDays.map((d: ContributionDay) => ({
-              date: d.date,
-              count: d.contributionCount,
-              level: d.contributionLevel,
-            }))
-          )
-        );
       })
       .catch(() => {
         setData(null);
