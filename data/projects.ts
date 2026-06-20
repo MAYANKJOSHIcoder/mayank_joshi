@@ -30,13 +30,13 @@ export const projects: Project[] = [
     featured: true,
   },
   {
-    title: "Portfolio Website",
+    title: "Personal Website",
     description:
-      "This portfolio website built with Next.js, Three.js, and Framer Motion. Features a 3D hero scene, dark/light theme, star fields, and blog.",
+      "This personal website built with Next.js, Three.js, and Framer Motion. Features a 3D hero scene, dark/light theme, and star fields.",
     image: "/images/projects/placeholder.png",
     tech: ["Next.js", "TypeScript", "Three.js", "Tailwind CSS", "Framer Motion"],
-    liveUrl: "#",
-    githubUrl: "https://github.com/MAYANKJOSHIcoder",
+    liveUrl: "https://mayank-joshi-07.vercel.app",
+    githubUrl: "https://github.com/MAYANKJOSHIcoder/mayank_joshi",
     featured: true,
   },
   {

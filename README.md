@@ -1,6 +1,6 @@
-# Mayank Joshi — Portfolio Website
+# Mayank Joshi — Personal Website
 
-> The personal portfolio of Mayank Joshi — CS student, AI/ML enthusiast, and builder from New Delhi.
+> The personal website of Mayank Joshi — CS student, AI/ML enthusiast, and builder from New Delhi.
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
@@ -18,7 +18,6 @@
 - **Projects Showcase** — Tech stack tags, live/demo links, and featured highlights with tilt effect cards
 - **Skills Overview** — Categorized skill badges with proficiency levels (Languages, Frameworks, AI/ML, Databases, Tools)
 - **Experience Timeline** — Chronological career/education timeline
-- **Blog** — MDX-based blog with syntax highlighting
 - **GitHub Activity Graph** — Full contribution calendar with multi-year selector, bright green contribution cells with glow effects, and stats (repos, stars, contributions)
 - **Last.fm Now Playing** — Live Spotify status via the Last.fm API (optional)
 - **Contact Form** — Centered form with auto-expanding textarea, powered by Resend (optional)
@@ -35,7 +34,6 @@
 | 3D Graphics        | [Three.js](https://threejs.org/) + [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/) + [Drei](https://github.com/pmndrs/drei) |
 | Animation          | [Framer Motion](https://www.framer.com/motion/) |
 | Icons              | [React Icons](https://react-icons.github.io/react-icons/) |
-| Blog               | [next-mdx-remote](https://github.com/hashicorp/next-mdx-remote) |
 | Theme Management   | [next-themes](https://github.com/pacocoursey/next-themes) |
 | Email              | [Resend](https://resend.com/)                   |
 | Analytics          | [Vercel Analytics](https://vercel.com/analytics) + [Speed Insights](https://vercel.com/docs/speed-insights) |
@@ -109,9 +107,6 @@ npm run lint
 │   ├── og/route.tsx              # Dynamic Open Graph image generation
 │   ├── robots.ts                 # Robots.txt generator
 │   ├── sitemap.ts                # Sitemap generator
-│   ├── blog/
-│   │   ├── page.tsx              # Blog listing
-│   │   └── [slug]/page.tsx       # Individual blog post (MDX)
 │   └── api/
 │       ├── github/route.ts       # GitHub GraphQL API (multi-year contributions)
 │       ├── spotify/route.ts      # Last.fm now-playing endpoint
@@ -210,7 +205,7 @@ The endpoint revalidates every 15 seconds for near real-time updates.
 
 ## 📄 License
 
-[MIT](LICENSE) — feel free to fork and build your own portfolio with this as a starting point.
+[MIT](LICENSE) — feel free to fork and build your own personal website with this as a starting point.
 
 ## 🔗 Links
 
