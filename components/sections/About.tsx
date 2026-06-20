@@ -5,12 +5,13 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SpotifyNowPlaying } from "@/components/ui/SpotifyNowPlaying";
 import { StarField } from "@/components/ui/StarField";
 import { siteConfig } from "@/data/site.config";
-import { FaMapMarkerAlt, FaGraduationCap, FaRobot, FaGamepad } from "react-icons/fa";
+import { CubeMascot } from "@/components/ui/CubeMascot";
+import { FaMapMarkerAlt, FaGraduationCap, FaBrain, FaGamepad } from "react-icons/fa";
 
 const quickFacts = [
   { icon: FaMapMarkerAlt, label: "Location", value: siteConfig.location },
   { icon: FaGraduationCap, label: "College", value: siteConfig.college },
-  { icon: FaRobot, label: "Focus", value: "AI / Machine Learning" },
+  { icon: FaBrain, label: "Focus", value: "AI / Machine Learning" },
   { icon: FaGamepad, label: "Hobbies", value: "Gaming & Photography" },
 ];
 
@@ -34,13 +35,13 @@ export function About() {
             transition={{ duration: 0.5 }}
             className="flex justify-center"
           >
-            <div className="relative">
-              <div className="h-64 w-64 rounded-2xl bg-gradient-to-br from-white/5 to-white/10 light:from-black/5 light:to-black/10 flex items-center justify-center border border-[var(--card-border)]">
-                <span className="text-6xl">👨‍💻</span>
-              </div>
-              <div className="absolute -bottom-3 -right-3 h-20 w-20 rounded-xl bg-white/10 light:bg-black/10 flex items-center justify-center border border-[var(--card-border)]">
-                <FaRobot className="h-8 w-8 text-[var(--muted)]" />
-              </div>
+            <div
+              className="rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)]
+                         w-[340px] h-[340px] max-md:w-[280px] max-md:h-[280px]
+                         flex items-center justify-center
+                         shadow-[0_4px_24px_rgba(0,0,0,0.08)] light:shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
+            >
+              <CubeMascot size={240} accentColor="#6ee7b7" interactive />
             </div>
           </motion.div>
 
