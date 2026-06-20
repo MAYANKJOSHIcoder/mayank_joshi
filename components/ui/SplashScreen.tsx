@@ -12,19 +12,27 @@ interface Star {
   delay: number;
 }
 
+// Seeded PRNG so server and client generate identical star positions
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
 export function SplashScreen() {
-  const stars: Star[] = useMemo(
-    () =>
-      Array.from({ length: 40 }, () => ({
-        width: Math.random() * 2 + 1,
-        height: Math.random() * 2 + 1,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        duration: Math.random() * 2 + 2,
-        delay: Math.random() * 2,
-      })),
-    []
-  );
+  const stars: Star[] = useMemo(() => {
+    const rand = seededRandom(42);
+    return Array.from({ length: 40 }, () => ({
+      width: rand() * 2 + 1,
+      height: rand() * 2 + 1,
+      left: rand() * 100,
+      top: rand() * 100,
+      duration: rand() * 2 + 2,
+      delay: rand() * 2,
+    }));
+  }, []);
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--background)]">
