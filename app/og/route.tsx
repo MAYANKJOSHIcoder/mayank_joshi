@@ -1,4 +1,4 @@
-import { ImageResponse } from "@vercel/og";
+import { ImageResponse } from "next/og";
 import { siteConfig } from "@/data/site.config";
 
 export const runtime = "edge";

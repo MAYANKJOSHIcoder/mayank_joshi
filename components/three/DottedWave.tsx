@@ -80,15 +80,11 @@ export function DottedWave() {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={TOTAL}
-          array={positions}
-          itemSize={3}
+          args={[positions, 3]}
         />
         <bufferAttribute
           attach="attributes-color"
-          count={TOTAL}
-          array={colors}
-          itemSize={3}
+          args={[colors, 3]}
         />
       </bufferGeometry>
       <pointsMaterial

@@ -13,6 +13,8 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+    // Mitigate unbounded disk cache growth (CVE fixed in Next.js 16.1.7)
+    maximumDiskCacheSize: 50 * 1024 * 1024, // 50 MB
   },
 };
 
