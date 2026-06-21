@@ -32,11 +32,17 @@ const LEFT_EYE = { x: 3, y: 4, w: 6, h: 8 };
 const RIGHT_EYE = { x: 15, y: 4, w: 6, h: 8 };
 
 // How far the face can slide from center in grid pixels
-const MAX_OFFSET = 4;
+const MAX_OFFSET = 6;
 
 // Lerp factors
-const TRACK_LERP = 0.07;
+const TRACK_LERP = 0.28;
 const IDLE_LERP = 0.025;
+
+// Max pupil travel within eye white (grid pixels)
+// With eye W=6, H=8 and pupil=3, safe range is ±1 horizontal, ±2 vertical
+// (must keep 1px white border between pupil edge and eye edge)
+const MAX_PUPIL_X = 1;
+const MAX_PUPIL_Y = 2;
 
 // Colors
 const SCREEN_BG_DARK = "#08080c";
@@ -49,7 +55,7 @@ const SCREEN_BG_LIGHT = "#d8d8e0";
 /*  blinkPhase: 0 = open, 1 = half, 2 = closed                       */
 /* ================================================================== */
 
-function buildFace(faceOx: number, faceOy: number, blinkPhase: number): Set<Pixel> {
+function buildFace(faceOx: number, faceOy: number, blinkPhase: number, pupilX: number, pupilY: number): Set<Pixel> {
   const pixels = new Set<Pixel>();
 
   const add = (lx: number, ly: number) => {
@@ -81,11 +87,26 @@ function buildFace(faceOx: number, faceOy: number, blinkPhase: number): Set<Pixe
       }
     }
 
-    // Pupil — 3×3 centered (1×1 when half-blinking)
+    // Pupil — 3×3 with independent gaze offset (1×1 when half-blinking)
+    // Dynamically clamped to always maintain ≥1px white border inside the eye
     if (blinkPhase < 2) {
       const ps = blinkPhase === 1 ? 1 : 3;
-      const pcx = ex + Math.floor(ew / 2) - Math.floor(ps / 2);
-      const pcy = ey + Math.floor(eyeH / 2) - Math.floor(ps / 2);
+      const border = 1;
+
+      // Safe range relative to eye origin
+      const minPx = border;
+      const maxPx = ew - ps - border;
+      const minPy = border;
+      const maxPy = eyeH - ps - border;
+
+      // Base (centered) position within eye
+      const basePx = Math.floor(ew / 2) - Math.floor(ps / 2);
+      const basePy = Math.floor(eyeH / 2) - Math.floor(ps / 2);
+
+      // Apply gaze offset then clamp to safe range
+      const pcx = ex + Math.max(minPx, Math.min(maxPx, basePx + pupilX));
+      const pcy = ey + Math.max(minPy, Math.min(maxPy, basePy + pupilY));
+
       for (let r = 0; r < ps; r++) {
         for (let c = 0; c < ps; c++) {
           addPupil(pcx + c, pcy + r);
@@ -194,6 +215,10 @@ export function CubeMascot({
   // Target offset
   const targetRef = useRef({ x: 0, y: 0 });
 
+  // Independent pupil tracking
+  const pupilTargetRef = useRef({ x: 0, y: 0 });
+  const pupilSmoothRef = useRef({ x: 0, y: 0 });
+
   // Blink
   const blinkRef = useRef({ phase: 0, timer: 0, nextIn: 4000 });
 
@@ -204,12 +229,6 @@ export function CubeMascot({
   const pixelsRef = useRef<Set<Pixel>>(new Set());
   const [, forceRender] = useState(0);
   const rerender = useCallback(() => forceRender((n) => n + 1), []);
-
-  // Touch
-  const isTouchRef = useRef(false);
-  useEffect(() => {
-    isTouchRef.current = !window.matchMedia("(pointer: fine)").matches;
-  }, []);
 
   // Theme
   const [isLight, setIsLight] = useState(false);
@@ -223,7 +242,7 @@ export function CubeMascot({
 
   // ---- Global pointer tracking ----
   useEffect(() => {
-    if (!interactive || isTouchRef.current) return;
+    if (!interactive) return;
 
     let idleTimeout: ReturnType<typeof setTimeout>;
 
@@ -244,9 +263,43 @@ export function CubeMascot({
       scheduleIdle();
     };
 
+    const handleTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      mouseRef.current = { x: touch.clientX - cx, y: touch.clientY - cy };
+      idleRef.current.active = false;
+      scheduleIdle();
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      mouseRef.current = { x: touch.clientX - cx, y: touch.clientY - cy };
+      idleRef.current.active = false;
+      scheduleIdle();
+    };
+
+    const handleTouchEnd = () => {
+      scheduleIdle();
+    };
+
     window.addEventListener("pointermove", handleMove);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd);
     return () => {
       window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
       clearTimeout(idleTimeout);
     };
   }, [interactive]);
@@ -271,12 +324,22 @@ export function CubeMascot({
         lerp = IDLE_LERP;
       } else {
         const dist = Math.hypot(mouseRef.current.x, mouseRef.current.y);
-        const norm = Math.min(dist / 180, 1);
+        const norm = Math.min(dist / 120, 1);
         const angle = Math.atan2(mouseRef.current.y, mouseRef.current.x);
         targetRef.current = {
-          x: Math.round(Math.cos(angle) * norm * MAX_OFFSET),
-          y: Math.round(Math.sin(angle) * norm * MAX_OFFSET),
+          x: Math.cos(angle) * norm * MAX_OFFSET,
+          y: Math.sin(angle) * norm * MAX_OFFSET,
         };
+
+        // Independent pupil offset — pupils move further than face slide
+        const pupilNorm = Math.min(norm * 2, 1);
+        const rawPX = Math.cos(angle) * pupilNorm * MAX_PUPIL_X;
+        const rawPY = Math.sin(angle) * pupilNorm * MAX_PUPIL_Y;
+        pupilTargetRef.current = {
+          x: Math.max(-MAX_PUPIL_X, Math.min(MAX_PUPIL_X, rawPX)),
+          y: Math.max(-MAX_PUPIL_Y, Math.min(MAX_PUPIL_Y, rawPY)),
+        };
+
         lerp = TRACK_LERP;
       }
 
@@ -284,8 +347,15 @@ export function CubeMascot({
       smoothRef.current.x += (targetRef.current.x - smoothRef.current.x) * lerp;
       smoothRef.current.y += (targetRef.current.y - smoothRef.current.y) * lerp;
 
+      // Pupils track faster than face slide
+      const pupilLerp = lerp * 1.6;
+      pupilSmoothRef.current.x += (pupilTargetRef.current.x - pupilSmoothRef.current.x) * pupilLerp;
+      pupilSmoothRef.current.y += (pupilTargetRef.current.y - pupilSmoothRef.current.y) * pupilLerp;
+
       const fox = Math.round(smoothRef.current.x);
       const foy = Math.round(smoothRef.current.y);
+      const ppx = Math.round(pupilSmoothRef.current.x);
+      const ppy = Math.round(pupilSmoothRef.current.y);
 
       // --- Blink ---
       blinkRef.current.nextIn -= dt;
@@ -307,7 +377,13 @@ export function CubeMascot({
       // --- Build & render ---
       const baseOx = Math.floor((GRID - FACE_W) / 2); // 4
       const baseOy = Math.floor((GRID - FACE_H) / 2); // 6
-      pixelsRef.current = buildFace(baseOx + fox, baseOy + foy, blinkPhase);
+
+      // When idle, gently return pupils to center
+      if (idleRef.current.active) {
+        pupilTargetRef.current = { x: 0, y: 0 };
+      }
+
+      pixelsRef.current = buildFace(baseOx + fox, baseOy + foy, blinkPhase, ppx, ppy);
       rerender();
 
       rafRef.current = requestAnimationFrame(tick);
