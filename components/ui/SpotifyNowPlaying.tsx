@@ -65,7 +65,19 @@ export function SpotifyNowPlaying() {
         </a>
         <p className="truncate text-xs text-[var(--muted)]">{data.artist}</p>
       </div>
-      <FaSpotify className="h-5 w-5 text-[var(--muted)] shrink-0" />
+      <div className="flex items-center gap-4 shrink-0">
+        <div
+          className={`spotify-equalizer ${
+            isNowPlaying ? "playing" : "paused"
+          }`}
+        >
+          <span />
+          <span />
+          <span />
+        </div>
+
+        <FaSpotify className="h-5 w-5 text-[var(--muted)]" />
+      </div>
     </div>
   );
 }
