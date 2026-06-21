@@ -2,10 +2,10 @@
 
 > The personal website of Mayank Joshi — CS student, AI/ML enthusiast, and builder from New Delhi.
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
-[![Three.js](https://img.shields.io/badge/Three.js-0.184-000000?logo=three.js)](https://threejs.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-0.170-000000?logo=three.js)](https://threejs.org/)
 
 ## ✨ Features
 
@@ -18,20 +18,22 @@
 - **Projects Showcase** — Tech stack tags, live/demo links, and featured highlights with tilt effect cards
 - **Skills Overview** — Categorized skill badges with proficiency levels (Languages, Frameworks, AI/ML, Databases, Tools)
 - **Experience Timeline** — Chronological career/education timeline
-- **GitHub Activity Graph** — Full contribution calendar with multi-year selector, bright green contribution cells with glow effects, and stats (repos, stars, contributions)
+- **GitHub Activity Graph** — Full contribution calendar with multi-year selector, GitHub's original green palette, and stats (repos, stars, contributions)
 - **Last.fm Now Playing** — Live Spotify status via the Last.fm API (optional)
 - **Contact Form** — Centered form with auto-expanding textarea, powered by Resend (optional)
 - **SEO Optimized** — Open Graph images (dynamic OG route), Twitter cards, `sitemap.xml`, `robots.ts`
 - **Vercel Analytics & Speed Insights** — Built-in performance monitoring
+- **Cube Mascot** — Interactive 3D mascot in the About section that follows your cursor
+- **Rate-Limited Contact Form** — 3 messages/hour and 10/day per IP via `rate-limiter-flexible`
 
 ## 🛠 Tech Stack
 
 | Layer              | Technology                                      |
 | ------------------ | ----------------------------------------------- |
-| Framework          | [Next.js 14](https://nextjs.org/) (App Router)  |
+| Framework          | [Next.js 15](https://nextjs.org/) (App Router)  |
 | Language           | [TypeScript](https://www.typescriptlang.org/)   |
 | Styling            | [Tailwind CSS](https://tailwindcss.com/)        |
-| 3D Graphics        | [Three.js](https://threejs.org/) + [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/) + [Drei](https://github.com/pmndrs/drei) |
+| 3D Graphics        | [Three.js 0.170](https://threejs.org/) + [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/) + [Drei](https://github.com/pmndrs/drei) |
 | Animation          | [Framer Motion](https://www.framer.com/motion/) |
 | Icons              | [React Icons](https://react-icons.github.io/react-icons/) |
 | Theme Management   | [next-themes](https://github.com/pacocoursey/next-themes) |
@@ -148,8 +150,6 @@ npm run lint
 │   ├── cn.ts                     # Tailwind merge utility (clsx + tailwind-merge)
 │   └── hooks/
 │       └── useIntersectionObserver.ts  # Shared viewport visibility hook
-├── public/
-│   └── images/                   # Static assets (project images, etc.)
 ├── tailwind.config.ts            # Tailwind configuration
 ├── next.config.mjs               # Next.js configuration
 ├── tsconfig.json                 # TypeScript configuration
@@ -159,7 +159,7 @@ npm run lint
 ## 🎨 Sections
 
 1. **Hero** — Greeting, tagline, and CTA buttons with an interactive 3D dotted wave background
-2. **About** — Bio, interests (AI/ML, Gaming, Photography/Art), quick facts
+2. **About** — Bio with interactive 3D cube mascot, interests, quick facts, and Spotify Now Playing widget
 3. **Projects** — Featured and non-featured project cards with tech stack badges and tilt effect
 4. **Skills** — Skills grouped by category (Languages, Frameworks, AI/ML, Databases, Tools) with an inline GitHub contribution graph
 5. **Experience** — Education, open-source contributions, hackathon participation
@@ -174,12 +174,12 @@ npm run lint
 
 ## 📊 GitHub Integration
 
-The GitHub contribution graph uses the **GitHub GraphQL API** (`contributionsCollection`) to fetch data for any year from 2008 to the current year.
+The GitHub contribution graph uses the **GitHub GraphQL API** (`contributionsCollection`) to fetch data for any year from 2008 to the current year. The calendar renders 52–53 weeks depending on the year.
 
 - **Multi-year selector** — Buttons let you switch between the last 5 years
-- **Contribution cells** — Bright neon greens with glow (`boxShadow`) for clear visibility on dark backgrounds; standard GitHub greens for light mode
+- **Contribution cells** — GitHub's original green palette (`#006d32` → `#56d364`) for both dark and light modes
 - **Stats row** — Shows total repositories, stars, and contributions for the selected year
-- **No scroll** — The full 53-week calendar fits within the card at all times
+- **Responsive** — Scrollable on smaller screens via `overflow-x-auto`
 
 ### Required Token Scope
 
@@ -205,7 +205,7 @@ The endpoint revalidates every 15 seconds for near real-time updates.
 
 ## 📄 License
 
-[MIT](LICENSE) — feel free to fork and build your own personal website with this as a starting point.
+No license file is included — feel free to fork and build your own personal website with this as a starting point.
 
 ## 🔗 Links
 
