@@ -17,7 +17,7 @@ const quickFacts = [
 
 export function About() {
   return (
-    <section id="about" className="relative py-24 overflow-hidden">
+    <section id="about" className="relative py-24 overflow-hidden bg-[var(--background)]">
       <div className="absolute inset-0 z-0">
         <StarField count={80} minOpacity={0.03} maxOpacity={0.15} parallaxStrength={0.01} />
       </div>
@@ -39,7 +39,7 @@ export function About() {
               className="rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)]
                          w-[340px] h-[340px] max-md:w-[280px] max-md:h-[280px]
                          flex items-center justify-center
-                         shadow-[0_4px_24px_rgba(0,0,0,0.08)] light:shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
+                         shadow-lg"
             >
               <CubeMascot size={240} accentColor="#6ee7b7" interactive />
             </div>
@@ -70,7 +70,7 @@ export function About() {
                 return (
                   <div
                     key={fact.label}
-                    className="flex items-center gap-3 rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-3"
+                    className="flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-4 shadow-sm"
                   >
                     <Icon className="h-4 w-4 text-[var(--muted)] shrink-0" />
                     <div>

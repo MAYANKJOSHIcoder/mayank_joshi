@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaChevronDown } from "react-icons/fa";
 import { Button } from "@/components/ui/Button";
@@ -10,11 +10,25 @@ import { siteConfig } from "@/data/site.config";
 const ThreeScene = lazy(() => import("@/components/three/Scene"));
 
 export function Hero() {
+  const [isLight, setIsLight] = useState(false);
+  useEffect(() => {
+    const check = () => setIsLight(document.documentElement.classList.contains("light"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* ⭐ Star field background */}
       <div className="absolute inset-0 z-0">
-        <StarField count={150} minOpacity={0.06} maxOpacity={0.25} parallaxStrength={0.03} />
+        <StarField
+          count={isLight ? 60 : 150}
+          minOpacity={isLight ? 0.01 : 0.06}
+          maxOpacity={isLight ? 0.05 : 0.25}
+          parallaxStrength={0.03}
+        />
       </div>
 
       {/* 3D Background */}
@@ -31,7 +45,7 @@ export function Hero() {
       </div>
 
       {/* Overlay gradient */}
-      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-[var(--background)]/40 to-[var(--background)]" />
+      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-[var(--background)]/60 to-[var(--background)]" />
 
       {/* Content */}
       <div className="relative z-10 mx-auto w-full px-4 text-center">

@@ -14,6 +14,7 @@ const MAX_TEXTAREA_HEIGHT = 200;
 export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const autoResize = useCallback(() => {
@@ -35,14 +36,22 @@ export function Contact() {
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) throw new Error("Failed");
-      setStatus("success");
-      setForm({ name: "", email: "", message: "" });
-      // Reset textarea height after clearing
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMessage(data.error || "Something went wrong. Please try again.");
+        setStatus("error");
+      } else {
+        setStatus("success");
+        setErrorMessage("");
+        setForm({ name: "", email: "", message: "" });
+        // Reset textarea height after clearing
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+        }
       }
     } catch {
+      setErrorMessage("Network error. Please check your connection.");
       setStatus("error");
     }
   };
@@ -125,7 +134,7 @@ export function Contact() {
           )}
           {status === "error" && (
             <div className="flex items-center gap-2 text-sm text-red-400">
-              <FaExclamationCircle /> Failed to send. Please try again.
+              <FaExclamationCircle /> {errorMessage}
             </div>
           )}
 

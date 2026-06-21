@@ -7,7 +7,7 @@ import { experiences } from "@/data/experience";
 
 export function Experience() {
   return (
-    <section id="experience" className="relative py-24 bg-[var(--card-bg)] overflow-hidden">
+    <section id="experience" className="relative py-24 bg-[var(--section-bg)] overflow-hidden">
       {/* ⭐ Star field */}
       <div className="absolute inset-0 z-0">
         <StarField count={50} minOpacity={0.03} maxOpacity={0.1} parallaxStrength={0.01} />

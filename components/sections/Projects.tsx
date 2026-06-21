@@ -7,7 +7,7 @@ import { projects } from "@/data/projects";
 
 export function Projects() {
   return (
-    <section id="projects" className="relative py-24 bg-[var(--card-bg)] overflow-hidden">
+    <section id="projects" className="relative py-24 bg-[var(--section-bg)] overflow-hidden">
       {/* ⭐ Star field */}
       <div className="absolute inset-0 z-0">
         <StarField count={60} minOpacity={0.03} maxOpacity={0.12} parallaxStrength={0.01} />

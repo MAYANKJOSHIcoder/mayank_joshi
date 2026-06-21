@@ -18,10 +18,10 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] transition-colors hover:border-[var(--foreground)]/20"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] shadow-sm transition-all hover:border-[var(--foreground)]/20 hover:shadow-lg"
     >
       {project.featured && (
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-1 rounded-full bg-white text-black px-3 py-1 text-xs font-semibold light:bg-black light:text-white">
+        <div className="absolute top-4 right-4 z-10 flex items-center gap-1 rounded-full bg-[var(--foreground)] px-3 py-1 text-xs font-semibold text-[var(--background)]">
           <FaStar className="h-3 w-3" />
           Featured
         </div>
@@ -44,7 +44,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           {project.tech.map((t) => (
             <span
               key={t}
-              className="rounded-full border border-[var(--card-border)] bg-white/5 light:bg-black/5 px-3 py-1 text-xs font-medium text-[var(--muted)]"
+              className="rounded-full border border-[var(--card-border)] bg-[var(--background)] px-3 py-1 text-xs font-medium text-[var(--muted)]"
             >
               {t}
             </span>
