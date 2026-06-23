@@ -211,7 +211,7 @@ The endpoint revalidates every 15 seconds for near real-time updates.
 
 ## 📄 License
 
-No license file is included — feel free to fork and build your own personal website with this as a starting point.
+This project is licensed under the [BSD 3-Clause License](LICENSE).
 
 ## 🔗 Links
 
