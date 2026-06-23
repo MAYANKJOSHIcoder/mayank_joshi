@@ -54,6 +54,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Limit email length before regex to prevent ReDoS (max valid email = 254 chars per RFC 5321)
+    if (email.length > 254) {
+      return NextResponse.json(
+        { error: "Invalid email address" },
+        { status: 400 }
+      );
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
