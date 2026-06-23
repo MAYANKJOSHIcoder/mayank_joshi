@@ -38,8 +38,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const query = `
-      query($from: DateTime!, $to: DateTime!) {
-        user(login: "${GITHUB_USERNAME}") {
+      query($login: String!, $from: DateTime!, $to: DateTime!) {
+        user(login: $login) {
           contributionsCollection(from: $from, to: $to) {
             contributionCalendar {
               totalContributions
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
         Authorization: `Bearer ${GITHUB_TOKEN}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ query, variables: { from, to } }),
+      body: JSON.stringify({ query, variables: { login: GITHUB_USERNAME, from, to } }),
     });
 
     if (!res.ok) throw new Error("GitHub API error");

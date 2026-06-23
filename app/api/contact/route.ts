@@ -32,10 +32,11 @@ async function checkRateLimit(ip: string): Promise<string | null> {
 // ── POST ───────────────────────────────────────────────────────────
 export async function POST(request: Request) {
   try {
-    // 1. Rate limit by IP
+    // 1. Rate limit by IP — use x-real-ip (set by Vercel edge) as primary,
+    //    fall back to x-forwarded-for only if x-real-ip is absent
     const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       request.headers.get("x-real-ip") ??
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       "unknown";
 
     const rateError = await checkRateLimit(ip);
@@ -61,6 +62,24 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verify the email domain has MX records to reject fake/non-existent domains
+    const domain = email.split("@")[1];
+    try {
+      const dns = await import("dns");
+      const records = await dns.promises.resolveMx(domain);
+      if (!records || records.length === 0) {
+        return NextResponse.json(
+          { error: "Email domain does not accept mail" },
+          { status: 400 }
+        );
+      }
+    } catch {
+      return NextResponse.json(
+        { error: "Email domain does not accept mail" },
+        { status: 400 }
+      );
+    }
+
     // 3. Content validation — reject very short or empty messages
     const trimmedMessage = message.trim();
     if (trimmedMessage.length < 20) {
@@ -70,9 +89,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const sanitizedName = name.trim().slice(0, 100);
-    const sanitizedEmail = email.trim().slice(0, 254);
-    const sanitizedMessage = trimmedMessage.slice(0, 2000);
+    // Strip newlines to prevent email header injection
+    const sanitizedName = name.trim().slice(0, 100).replace(/[\r\n]/g, "");
+    const sanitizedEmail = email.trim().slice(0, 254).replace(/[\r\n]/g, "");
+    const sanitizedMessage = trimmedMessage.slice(0, 2000).replace(/[\r\n]/g, "");
 
     // 4. Send via Resend
     if (!RESEND_API_KEY || !CONTACT_EMAIL) {
