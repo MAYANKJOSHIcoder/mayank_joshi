@@ -39,10 +39,10 @@ const NONE_BORDER_LIGHT = "#d0d7de";
 // Contribution graph colors — light mode (GitHub's original palette)
 const LEVEL_COLORS_LIGHT: Record<string, string> = {
   NONE: "#ebedf0",
-  FIRST_QUARTER: "#9be9a8",
-  SECOND_QUARTER: "#40c463",
-  THIRD_QUARTER: "#30a14e",
-  FOURTH_QUARTER: "#216e39",
+  FIRST_QUARTER: "#006d32",
+  SECOND_QUARTER: "#26a641",
+  THIRD_QUARTER: "#39d353",
+  FOURTH_QUARTER: "#56d364",
 };
 
 const MONTH_LABELS = [
@@ -264,16 +264,17 @@ export function GitHubGraph() {
                 const date = day?.date ?? "";
 
                 let bg: string;
+
                 if (count === 0) {
                   bg = colors.NONE;
                 } else if (count <= 2) {
-                  bg = "#006d32";
+                  bg = colors.FIRST_QUARTER;
                 } else if (count <= 5) {
-                  bg = "#26a641";
+                  bg = colors.SECOND_QUARTER;
                 } else if (count <= 10) {
-                  bg = "#39d353";
+                  bg = colors.THIRD_QUARTER;
                 } else {
-                  bg = "#56d364";
+                  bg = colors.FOURTH_QUARTER;
                 }
                 const hasContributions = count > 0;
 
