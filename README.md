@@ -23,8 +23,10 @@
 - **Contact Form** — Centered form with auto-expanding textarea, powered by Resend (optional)
 - **SEO Optimized** — Open Graph images (dynamic OG route), Twitter cards, `sitemap.xml`, `robots.ts`
 - **Vercel Analytics & Speed Insights** — Built-in performance monitoring
-- **Cube Mascot** — Interactive 3D mascot in the About section that follows your cursor
-- **Rate-Limited Contact Form** — 3 messages/hour and 10/day per IP via `rate-limiter-flexible`
+- **Cube Mascot** — Interactive 3D pixel-art mascot in the About section with cursor-tracking eyes, blinking, and idle float animation
+- **Lazy-Loaded Sections** — Skills, Experience, and Contact sections are code-split with `React.lazy()` + `Suspense` for smaller initial bundle
+- **Security-Hardened Contact Form** — Rate-limited (3/hour + 10/day per IP), MX record validation, email header injection protection, and ReDoS-safe input handling
+- **Responsive DPR** — Canvas device pixel ratio capped at 2x to balance quality and performance
 
 ## 🛠 Tech Stack
 
@@ -134,6 +136,7 @@ npm run lint
 │       ├── ThemeToggle.tsx       # Dark/light toggle
 │       ├── ScrollProgress.tsx    # Reading progress bar
 │       ├── Button.tsx            # Reusable button
+│       ├── CubeMascot.tsx        # Interactive pixel-art mascot (cursor-tracking)
 │       ├── SectionHeading.tsx    # Section title component
 │       ├── ProjectCard.tsx       # Project card with tilt effect
 │       ├── SkillBadge.tsx        # Skill pill/badge
@@ -150,6 +153,8 @@ npm run lint
 │   ├── cn.ts                     # Tailwind merge utility (clsx + tailwind-merge)
 │   └── hooks/
 │       └── useIntersectionObserver.ts  # Shared viewport visibility hook
+├── certificates/                 # Localhost SSL certs (for dev)
+├── eslint.config.mjs             # ESLint flat config
 ├── tailwind.config.ts            # Tailwind configuration
 ├── next.config.mjs               # Next.js configuration
 ├── tsconfig.json                 # TypeScript configuration
@@ -171,6 +176,7 @@ npm run lint
 - **Viewport-aware star field** — The canvas-based `StarField` animation cancels its `requestAnimationFrame` loop when not visible, saving CPU cycles
 - **Shared `useIntersectionObserver` hook** — A reusable `lib/hooks/useIntersectionObserver.ts` powers both optimizations with a single `IntersectionObserver` per component
 - **Responsive DPR** — Canvas device pixel ratio is capped at 2x to balance quality and performance
+- **Code Splitting** — Skills, Experience, and Contact sections are lazy-loaded with `React.lazy()` + `Suspense`, reducing the initial JS bundle size
 
 ## 📊 GitHub Integration
 
