@@ -29,13 +29,16 @@ export async function GET() {
     // Last.fm returns "@attr": { "nowplaying": "true" } when currently playing
     const isNowPlaying = track["@attr"]?.nowplaying === "true";
 
-    // Album art: Last.fm returns images in sizes: small, medium, large, extralarge
+    // Album art: prefer medium (64×64) — display size is 48×48, avoid downloading 300×300
     const albumArt =
       track.image?.find(
-        (img: { size: string; "#text": string }) => img.size === "extralarge"
+        (img: { size: string; "#text": string }) => img.size === "medium"
       )?.["#text"] ||
       track.image?.find(
         (img: { size: string; "#text": string }) => img.size === "large"
+      )?.["#text"] ||
+      track.image?.find(
+        (img: { size: string; "#text": string }) => img.size === "extralarge"
       )?.["#text"] ||
       undefined;
 

@@ -10,7 +10,7 @@
   --accent: #a0a0a0;
   --card-bg: #141414;
   --card-border: #222222;
-  --muted: #707070;
+  --muted: #a0a0a0;
   --section-bg: #0f0f0f;
 }
 
@@ -20,7 +20,7 @@
   --primary: #111827;
   --primary-light: #000000;
   --accent: #4b5563;
-  --muted: #6b7280;
+  --muted: #4b5563;
   --card-bg: #ffffff;
   --card-border: #d1d5db;
   --section-bg: #f3f4f6;

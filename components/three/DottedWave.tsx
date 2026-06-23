@@ -4,8 +4,8 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Points } from "three";
 
-const GRID_X = 60;
-const GRID_Z = 60;
+const GRID_X = 30;
+const GRID_Z = 30;
 const TOTAL = GRID_X * GRID_Z;
 const SPREAD_X = 12;
 const SPREAD_Z = 12;
@@ -13,12 +13,11 @@ const SPREAD_Z = 12;
 export function DottedWave() {
   const pointsRef = useRef<Points>(null);
 
-  const { positions, colors, phaseX, phaseZ, phaseXZ } = useMemo(() => {
+  const { positions, colors, phaseX, phaseZ } = useMemo(() => {
     const positions = new Float32Array(TOTAL * 3);
     const colors = new Float32Array(TOTAL * 3);
     const phaseX = new Float32Array(TOTAL);
     const phaseZ = new Float32Array(TOTAL);
-    const phaseXZ = new Float32Array(TOTAL);
 
     for (let i = 0; i < GRID_X; i++) {
       for (let j = 0; j < GRID_Z; j++) {
@@ -33,7 +32,6 @@ export function DottedWave() {
         // Pre-compute static phase offsets
         phaseX[dotIdx] = x * 0.4;
         phaseZ[dotIdx] = z * 0.35;
-        phaseXZ[dotIdx] = (x + z) * 0.25;
 
         // Monochrome: white to light gray based on position
         const brightness = 0.5 + (i / GRID_X) * 0.4;
@@ -43,7 +41,7 @@ export function DottedWave() {
       }
     }
 
-    return { positions, colors, phaseX, phaseZ, phaseXZ };
+    return { positions, colors, phaseX, phaseZ };
   }, []);
 
   useFrame((state) => {
@@ -58,11 +56,10 @@ export function DottedWave() {
         const idx = (i * GRID_Z + j) * 3;
         const dotIdx = i * GRID_Z + j;
 
-        // Wave function: pre-computed phase offsets + time-varying component
+        // Wave function: 2 wave terms for efficiency
         const y =
           Math.sin(phaseX[dotIdx] + time * 0.7) * 0.6 +
-          Math.cos(phaseZ[dotIdx] + time * 0.5) * 0.5 +
-          Math.sin(phaseXZ[dotIdx] + time * 0.4) * 0.3;
+          Math.cos(phaseZ[dotIdx] + time * 0.5) * 0.5;
 
         posArray[idx + 1] = y;
       }

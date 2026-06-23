@@ -207,6 +207,8 @@ export function CubeMascot({
 }: CubeMascotProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
+  const lastTimeRef = useRef(0);
+  const isVisibleRef = useRef(false);
 
   // Mouse relative to mascot center
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -305,12 +307,12 @@ export function CubeMascot({
   }, [interactive]);
 
   // ---- Animation loop ----
-  useEffect(() => {
-    let lastTime = 0;
+  const tickRef = useRef<(time: number) => void>(() => {});
 
-    const tick = (time: number) => {
-      const dt = lastTime ? time - lastTime : 16;
-      lastTime = time;
+  useEffect(() => {
+    tickRef.current = (time: number) => {
+      const dt = lastTimeRef.current ? time - lastTimeRef.current : 16;
+      lastTimeRef.current = time;
 
       // --- Target computation ---
       let lerp: number;
@@ -386,12 +388,34 @@ export function CubeMascot({
       pixelsRef.current = buildFace(baseOx + fox, baseOy + foy, blinkPhase, ppx, ppy);
       rerender();
 
-      rafRef.current = requestAnimationFrame(tick);
+      rafRef.current = requestAnimationFrame(tickRef.current);
     };
 
-    rafRef.current = requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(tickRef.current);
     return () => cancelAnimationFrame(rafRef.current);
   }, [rerender]);
+
+  // ---- Pause animation when off-screen ----
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = 0;
+        } else if (!rafRef.current) {
+          lastTimeRef.current = 0;
+          rafRef.current = requestAnimationFrame(tickRef.current);
+        }
+      },
+      { threshold: 0, rootMargin: "100px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   /* ---------------------------------------------------------------- */
   /*  Layout                                                           */

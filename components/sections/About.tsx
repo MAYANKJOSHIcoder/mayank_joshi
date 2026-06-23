@@ -1,12 +1,14 @@
 "use client";
 
+import { lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SpotifyNowPlaying } from "@/components/ui/SpotifyNowPlaying";
 import { StarField } from "@/components/ui/StarField";
 import { siteConfig } from "@/data/site.config";
-import { CubeMascot } from "@/components/ui/CubeMascot";
 import { FaMapMarkerAlt, FaGraduationCap, FaBrain, FaGamepad } from "react-icons/fa";
+
+const CubeMascot = lazy(() => import("@/components/ui/CubeMascot").then((m) => ({ default: m.CubeMascot })));
 
 const quickFacts = [
   { icon: FaMapMarkerAlt, label: "Location", value: siteConfig.location },
@@ -41,7 +43,9 @@ export function About() {
                          flex items-center justify-center
                          shadow-lg"
             >
-              <CubeMascot size={240} accentColor="#6ee7b7" interactive />
+              <Suspense fallback={<div className="h-[240px] w-[240px]" />}>
+                <CubeMascot size={240} accentColor="#6ee7b7" interactive />
+              </Suspense>
             </div>
           </motion.div>
 

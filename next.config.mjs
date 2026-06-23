@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    optimizePackageImports: [
+      "framer-motion",
+      "three",
+      "@react-three/fiber",
+      "@react-three/drei",
+      "react-icons",
+    ],
+  },
   images: {
     remotePatterns: [
       {

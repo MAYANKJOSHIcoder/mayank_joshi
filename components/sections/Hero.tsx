@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy, useState, useEffect } from "react";
+import { Suspense, lazy, useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { FaChevronDown } from "react-icons/fa";
 import { Button } from "@/components/ui/Button";
@@ -11,12 +11,25 @@ const ThreeScene = lazy(() => import("@/components/three/Scene"));
 
 export function Hero() {
   const [isLight, setIsLight] = useState(false);
+  const [sceneReady, setSceneReady] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const check = () => setIsLight(document.documentElement.classList.contains("light"));
     check();
     const observer = new MutationObserver(check);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
+  }, []);
+
+  // Defer 3D scene mount until after first paint / when idle
+  useEffect(() => {
+    if ("requestIdleCallback" in window) {
+      const id = (window as Window & { requestIdleCallback: (cb: () => void) => number }).requestIdleCallback(() => setSceneReady(true));
+      return () => (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(id);
+    }
+    const id = setTimeout(() => setSceneReady(true), 100);
+    return () => clearTimeout(id);
   }, []);
 
   return (
@@ -32,16 +45,18 @@ export function Hero() {
       </div>
 
       {/* 3D Background */}
-      <div className="absolute inset-0 z-[1]">
-        <Suspense
-          fallback={
-            <div className="flex h-full w-full items-center justify-center bg-transparent">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--foreground)] border-t-transparent" />
-            </div>
-          }
-        >
-          <ThreeScene />
-        </Suspense>
+      <div ref={containerRef} className="absolute inset-0 z-[1]" style={{ willChange: "transform" }}>
+        {sceneReady && (
+          <Suspense
+            fallback={
+              <div className="flex h-full w-full items-center justify-center bg-transparent">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--foreground)] border-t-transparent" />
+              </div>
+            }
+          >
+            <ThreeScene />
+          </Suspense>
+        )}
       </div>
 
       {/* Overlay gradient */}
@@ -102,10 +117,12 @@ export function Hero() {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
         className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2"
+        style={{ willChange: "transform, opacity" }}
       >
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
+          style={{ willChange: "transform" }}
         >
           <FaChevronDown className="h-6 w-6 text-[var(--muted)]" />
         </motion.div>
