@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ThemeToggle } from "./ThemeToggle";
 import { ScrollProgress } from "./ScrollProgress";
 
 const navLinks = [
@@ -50,11 +49,9 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <ThemeToggle />
           </div>
 
           <div className="flex items-center gap-4 md:hidden">
-            <ThemeToggle />
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="flex flex-col gap-1.5"

@@ -1,6 +1,5 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { useEffect, useState } from "react";
@@ -16,7 +15,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <>
       {/* Hidden during splash to avoid unnecessary GPU/CPU work */}
       <div style={{ visibility: showSplash ? "hidden" : "visible" }}>
         {children}
@@ -35,6 +34,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
       <Analytics />
       <SpeedInsights />
-    </ThemeProvider>
+    </>
   );
 }

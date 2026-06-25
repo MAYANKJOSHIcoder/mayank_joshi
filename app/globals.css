@@ -14,18 +14,6 @@
   --section-bg: #0f0f0f;
 }
 
-.light {
-  --background: #fafafa;
-  --foreground: #111827;
-  --primary: #111827;
-  --primary-light: #000000;
-  --accent: #4b5563;
-  --muted: #4b5563;
-  --card-bg: #ffffff;
-  --card-border: #d1d5db;
-  --section-bg: #f3f4f6;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -62,20 +50,10 @@ body {
   background: #555;
 }
 
-.light ::-webkit-scrollbar-thumb {
-  background: #bbb;
-}
-.light ::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
 
 /* Selection */
 ::selection {
   background: #333;
-  color: #fff;
-}
-.light ::selection {
-  background: #111;
   color: #fff;
 }
 
@@ -91,22 +69,10 @@ body {
     background-clip: text;
   }
 
-  .light .gradient-text {
-    background: linear-gradient(135deg, #111827, #374151);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
   .glass {
     background: rgba(20, 20, 20, 0.8);
     backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .light .glass {
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(0, 0, 0, 0.06);
   }
 
 }

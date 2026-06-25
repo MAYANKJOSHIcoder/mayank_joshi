@@ -11,7 +11,7 @@
 
 - **3D Hero Scene** — Interactive Three.js/R3F dotted wave animation with viewport-aware rendering (pauses when off-screen to save GPU/CPU)
 - **Animated Star Field** — Decorative canvas particle background with parallax mouse effect and viewport-aware animation pausing
-- **Dark/Light Theme** — System-aware theme toggle with `next-themes`
+- **Dark Theme** — Permanently dark UI; no light-mode codepath
 - **Smooth Animations** — Framer Motion-powered transitions and scroll reveals
 - **Splash Screen** — Intro animation on first visit
 - **Scroll Progress** — Reading progress indicator at the top of the page
@@ -38,7 +38,6 @@
 | 3D Graphics        | [Three.js 0.170](https://threejs.org/) + [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/) + [Drei](https://github.com/pmndrs/drei) |
 | Animation          | [Framer Motion](https://www.framer.com/motion/) |
 | Icons              | [React Icons](https://react-icons.github.io/react-icons/) |
-| Theme Management   | [next-themes](https://github.com/pacocoursey/next-themes) |
 | Email              | [Resend](https://resend.com/)                   |
 | Analytics          | [Vercel Analytics](https://vercel.com/analytics) + [Speed Insights](https://vercel.com/docs/speed-insights) |
 | Deployment         | [Vercel](https://vercel.com/)                   |
@@ -117,7 +116,7 @@ npm run lint
 │       └── contact/route.ts      # Contact form email via Resend
 ├── components/
 │   ├── layout/
-│   │   └── Providers.tsx         # Global layout wrappers (theme, analytics)
+│   │   └── Providers.tsx         # Global layout wrappers (analytics, splash screen)
 │   ├── sections/                 # Page sections
 │   │   ├── Hero.tsx              # Hero with 3D scene
 │   │   ├── About.tsx             # About / bio
@@ -133,7 +132,6 @@ npm run lint
 │       ├── Footer.tsx            # Footer
 │       ├── StarField.tsx         # Animated star particles (viewport-aware)
 │       ├── SplashScreen.tsx      # Intro splash screen
-│       ├── ThemeToggle.tsx       # Dark/light toggle
 │       ├── ScrollProgress.tsx    # Reading progress bar
 │       ├── Button.tsx            # Reusable button
 │       ├── CubeMascot.tsx        # Interactive pixel-art mascot (cursor-tracking)
@@ -204,7 +202,7 @@ The endpoint revalidates every 15 seconds for near real-time updates.
 ## 📝 Customization
 
 - **Content**: Edit the files in `data/` to update site info, projects, skills, and experience.
-- **Colors & Theme**: Adjust CSS variables in `app/globals.css` and Tailwind theme in `tailwind.config.ts`.
+- **Colors & Theme**: Adjust CSS variables in `app/globals.css` and Tailwind theme in `tailwind.config.ts`. The site is dark-only; `app/layout.tsx` pins `className="dark"` on `<html>` so Tailwind `dark:` utilities continue to work.
 - **Fonts**: Change the font in `app/layout.tsx` (currently [Outfit](https://fonts.google.com/specimen/Outfit)).
 - **3D Scene**: Modify `components/three/DottedWave.tsx` or swap the scene entirely.
 - **GitHub username**: Update the username in `app/api/github/route.ts`.
